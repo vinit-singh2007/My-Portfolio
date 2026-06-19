@@ -16,7 +16,7 @@ export default function Footer() {
 
   return (
     <footer className="w-full border-t border-zinc-200/10 dark:border-zinc-800/50 py-12 px-6 bg-white/20 dark:bg-slate-950/20 z-10">
-      <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+      <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center  gap-6">
         {/* Brand */}
         <button
           suppressHydrationWarning
@@ -32,7 +32,7 @@ export default function Footer() {
         </button>
 
         {/* Links */}
-        <div className="flex items-center gap-6 text-sm text-zinc-500 dark:text-zinc-400">
+        {/* <div className="flex items-center gap-6 text-sm text-zinc-500 dark:text-zinc-400">
           <button suppressHydrationWarning onClick={() => scrollTo('projects')} className="hover:text-indigo-500 dark:hover:text-cyan-400 transition-colors cursor-pointer">
             Projects
           </button>
@@ -45,10 +45,10 @@ export default function Footer() {
           <button suppressHydrationWarning onClick={() => scrollTo('contact')} className="hover:text-indigo-500 dark:hover:text-cyan-400 transition-colors cursor-pointer">
             Contact
           </button>
-        </div>
+        </div> */}
 
         {/* Copyright */}
-        <span className="text-xs text-zinc-400 dark:text-zinc-500 font-light">
+        <span className="text-xs text-zinc-400 pl-110 dark:text-zinc-500 font-light">
           &copy; {new Date().getFullYear()} AxeVin. All rights reserved.
         </span>
       </div>

@@ -60,7 +60,7 @@ export default function Navbar() {
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.8, ease: 'easeOut' }}
       className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${scrolled
-        ? 'py-3.5 glass shadow-lg bg-white/70 dark:bg-slate-950/70'
+        ? 'py-3.5 glass shadow-lg !bg-white/90 dark:!bg-black/90'
         : 'py-6 bg-transparent border-b border-transparent'
         }`}
     >
@@ -146,7 +146,7 @@ export default function Navbar() {
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.3 }}
-            className="md:hidden w-full glass bg-white/95 dark:bg-slate-950/95 overflow-hidden"
+            className="md:hidden w-full glass !bg-white/95 dark:!bg-black/95 overflow-hidden"
           >
             <div className="px-6 py-4 flex flex-col gap-4">
               {NAV_ITEMS.map((item) => (
