@@ -35,8 +35,8 @@ const PROJECTS = [
     image: '/Project_fullstack.png',
     description: "Built a web-based career simulation platform that helps students and freshers experience real-world job roles before entering the workforce. Users select a career path and complete daily tasks in a simulated work environment designed to mirror actual workplace pressures and expectations.",
     tech: ['React', 'Node.js', 'Express.js', 'MongoDB', 'Machine Learning'],
-    demo: '#',
-    repo: '#',
+    demo: 'https://day-0-delta.vercel.app/',
+    repo: 'https://github.com/vinit-singh2007/Day-0',
   },
   {
     id: 2,
