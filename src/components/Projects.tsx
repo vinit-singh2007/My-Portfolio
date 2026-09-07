@@ -32,7 +32,7 @@ const PROJECTS = [
     id: 1,
     title: 'Day 0',
     category: 'Full-Stack',
-    image: '/Project_fullstack.png',
+    image: '/project_day0.png',
     description: "Built a web-based career simulation platform that helps students and freshers experience real-world job roles before entering the workforce. Users select a career path and complete daily tasks in a simulated work environment designed to mirror actual workplace pressures and expectations.",
     tech: ['React', 'Node.js', 'Express.js', 'MongoDB', 'Machine Learning'],
     demo: 'https://day-0-delta.vercel.app/',
