@@ -42,7 +42,7 @@ const PROJECTS = [
     id: 2,
     title: 'Disk Scheduling Algorithm Analyzer',
     category: 'DSA+Backend',
-    image: '/Project_DSA_Backend.png',
+    image: '/project_DSAA.png',
     description: "Built a  web application that visualizes and analyzes classic disk scheduling algorithms helping students and developers understand operating system concepts through interactive simulation.",
     tech: ['React', 'Node.js', 'Express.js', 'DSA', 'Algorithm'],
     demo: 'https://disk-scheduling-algorithm-analyzer-1.onrender.com',
@@ -50,13 +50,13 @@ const PROJECTS = [
   },
   {
     id: 3,
-    title: 'Coming........',
+    title: 'DeepShield',
     category: 'AI/Ml',
-    image: '/Project_aiml.png',
-    description: '',
-    tech: [],
+    image: '/project_deepshield.png',
+    description: "Developed a web-based deepfake detection platform that enables users to upload and evaluate video files for authenticity.Integrated frame-by-frame lip-sync verification and facial landmark analysis to identify potential manipulations.Included temporal analysis tools to track anomalies and inconsistencies across video timelines.",
+    tech: ['React','Tailwind CSS','python','FastAPI','PyTorch','OpenCV'],
     demo: '#',
-    repo: '#',
+    repo: 'https://github.com/vinit-singh2007/Deepfake_Detection',
   },
 ];
 
