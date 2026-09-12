@@ -146,7 +146,7 @@ export default function Navbar() {
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.3 }}
-            className="md:hidden w-full glass !bg-white/95 dark:!bg-black/95 overflow-hidden"
+            className="md:hidden w-full glass !bg-white/95 dark:!bg-black/95 overflow-hidden relative z-50 pointer-events-auto"
           >
             <div className="px-6 py-4 flex flex-col gap-4">
               {NAV_ITEMS.map((item) => (
@@ -154,16 +154,32 @@ export default function Navbar() {
                   suppressHydrationWarning
                   key={item.id}
                   onClick={() => scrollTo(item.id)}
-                  className={`text-left py-2 font-medium text-base transition-colors ${activeSection === item.id
+                  className={`text-left py-3 px-2 w-full font-medium text-base transition-colors cursor-pointer pointer-events-auto touch-manipulation ${activeSection === item.id
                     ? 'text-indigo-600 dark:text-cyan-400'
                     : 'text-zinc-600 dark:text-zinc-400'
                     }`}
+                  style={{ WebkitTapHighlightColor: 'transparent' }}
                 >
                   {item.label}
                 </button>
               ))}
             </div>
           </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Backdrop overlay to block background pointer events when mobile menu is open */}
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 top-0 left-0 w-full h-full z-40 md:hidden"
+            style={{ pointerEvents: 'all' }}
+            onClick={() => setMobileMenuOpen(false)}
+          />
         )}
       </AnimatePresence>
     </motion.header>
