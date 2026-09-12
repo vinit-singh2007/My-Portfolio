@@ -48,7 +48,7 @@ export default function Footer() {
         </div> */}
 
         {/* Copyright */}
-        <span className="text-xs text-zinc-400 pl-110 dark:text-zinc-500 font-light">
+        <span className="text-xs text-zinc-400 md:ml-auto dark:text-zinc-500 font-light">
           &copy; {new Date().getFullYear()} AxeVin. All rights reserved.
         </span>
       </div>
