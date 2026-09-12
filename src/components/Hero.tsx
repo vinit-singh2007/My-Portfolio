@@ -143,7 +143,7 @@ export default function Hero() {
             transition={{ duration: 0.8, delay: 0.1, ease: [0.16, 1, 0.3, 1] as const }}
             className="text-4xl md:text-7xl font-extrabold tracking-tight leading-[1.15] text-zinc-900 dark:text-white"
           >
-            Hi, I&apos;m VINIT<span className="text-indigo-500 dark:text-cyan-400">.</span>
+             VINIT SINGH<span className="text-indigo-500 dark:text-cyan-400">.</span>
           </motion.h1>
 
           {/* Subtitle */}
@@ -207,7 +207,7 @@ export default function Hero() {
           </motion.div>
         </div>
 
-        {/* Right column (Illustration) */}
+        {/* Right column (Illustration) - Hidden on mobile, visible on desktop */}
         <motion.div
           variants={{
             hidden: { opacity: 0, x: 40 },
@@ -216,7 +216,7 @@ export default function Hero() {
           initial="hidden"
           animate="visible"
           transition={{ duration: 0.9, delay: 0.2, ease: [0.16, 1, 0.3, 1] as const }}
-          className="lg:col-span-4 flex justify-center lg:justify-end"
+          className="hidden lg:flex lg:col-span-4 justify-center lg:justify-end"
         >
           {/* Illustration card with glow */}
           <motion.div
