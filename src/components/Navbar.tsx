@@ -143,7 +143,7 @@ export default function Navbar() {
             className="flex items-center gap-2.5 py-0.5 rounded-full group cursor-pointer focus:outline-none"
             aria-label="Scroll to top"
           >
-            <div className="relative w-7.5 h-7.5 sm:w-8 sm:h-8 rounded-full overflow-hidden border border-indigo-500/20 dark:border-cyan-500/30 flex items-center justify-center bg-zinc-900/50 group-hover:scale-105 group-hover:border-cyan-400/60 transition-all duration-300 shadow-sm">
+            <div className="relative w-8 h-8 rounded-lg overflow-hidden border border-zinc-200/20 dark:border-zinc-800/80 flex items-center justify-center bg-zinc-900/50 group-hover:scale-105 group-hover:border-indigo-500/40 transition-all duration-300 shadow-sm">
               <Image
                 src="/logo.png"
                 alt="AxeVin Logo"
