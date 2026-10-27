@@ -48,16 +48,6 @@ const PROJECTS = [
     demo: '#',
     repo: 'https://github.com/vinit-singh2007/AeroRoute-AI',
   },
-  // {
-  //   id: ,
-  //   title: 'Disk Scheduling Algorithm Analyzer',
-  //   category: 'DSA+Backend',
-  //   image: '/project_DSAA.png',
-  //   description: "Built a  web application that visualizes and analyzes classic disk scheduling algorithms helping students and developers understand operating system concepts through interactive simulation.",
-  //   tech: ['React', 'Node.js', 'Express.js', 'DSA', 'Algorithm'],
-  //   demo: 'https://disk-scheduling-algorithm-analyzer-1.onrender.com',
-  //   repo: 'https://github.com/vinit-singh2007/Disk-scheduling-Algorithm-Analyzer',
-  // },
   {
     id: 3,
     title: 'DeepShield',
@@ -68,6 +58,27 @@ const PROJECTS = [
     demo: '#',
     repo: 'https://github.com/vinit-singh2007/Deepfake_Detection',
   },
+  {
+    id:4 ,
+    title: 'Disk Scheduling Algorithm Analyzer',
+    category: 'DSA+Backend',
+    image: '/project_DSAA.png',
+    description: "Built a  web application that visualizes and analyzes classic disk scheduling algorithms helping students and developers understand operating system concepts through interactive simulation.",
+    tech: ['React', 'Node.js', 'Express.js', 'DSA', 'Algorithm'],
+    demo: 'https://disk-scheduling-algorithm-analyzer-1.onrender.com',
+    repo: 'https://github.com/vinit-singh2007/Disk-scheduling-Algorithm-Analyzer',
+  },
+  {
+    id:5 ,
+    title: 'Mirror Memory',
+    category: 'IOT + FUll-STACK',
+    image: '/project_memory_mirror.jpeg',
+    description: "An IoT-powered inventory system that links physical equipment to a live web dashboard using an ESP32 and RFID tags. It tracks asset status, records maintenance history, and generates QR badges, with every scan synced in real time.",
+    tech: ['React', 'Node.js', 'Express.js', 'Supabase', 'ESP32','RFID'],
+    demo: '#',
+    repo: 'https://github.com/vinit-singh2007/Smart_Inventory_System',
+  },
+  
 ];
 
 export default function Projects() {
