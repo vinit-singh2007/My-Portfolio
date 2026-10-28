@@ -130,17 +130,56 @@ export default function Navbar() {
         className="fixed top-2 sm:top-3 inset-x-0 z-50 flex justify-center px-4 sm:px-6 pointer-events-none"
       >
         <div
-          className={`pointer-events-auto w-[94%] max-w-6xl flex items-center justify-between px-5 sm:px-8 py-1.5 sm:py-2 rounded-full transition-all duration-300 backdrop-blur-md border ${
-            scrolled
+          className={`pointer-events-auto relative w-[94%] max-w-6xl flex items-center justify-between px-5 sm:px-8 py-1.5 sm:py-2 rounded-lg transition-all duration-300 backdrop-blur-md border ${scrolled
               ? 'bg-white/40 dark:bg-black/40 border-zinc-200/50 dark:border-white/10 shadow-xl shadow-black/5 dark:shadow-black/30 backdrop-blur-xl'
               : 'bg-white/20 dark:bg-black/20 border-zinc-200/40 dark:border-white/[0.08] shadow-md shadow-black/5 dark:shadow-black/20'
-          }`}
+            }`}
         >
+          {/* ── Soft Ambient Glow of the Whole Border ── */}
+          <div
+            className="absolute -inset-[2px] rounded-lg pointer-events-none p-[2px] overflow-hidden z-10 opacity-30 blur-[2px]"
+            style={{
+              mask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+              maskComposite: 'exclude',
+              WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+              WebkitMaskComposite: 'xor',
+            }}
+          >
+            <div
+              className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[max(200vw,2200px)] h-[max(200vw,2200px)]"
+              style={{
+                background:
+                  'conic-gradient(from 0deg, rgba(99, 102, 241, 0.3) 0%, rgba(168, 85, 247, 0.3) 25%, rgba(6, 182, 212, 0.3) 50%, rgba(168, 85, 247, 0.3) 75%, rgba(99, 102, 241, 0.3) 100%)',
+                animation: 'spinSlow 8s linear infinite',
+              }}
+            />
+          </div>
+
+          {/* ── Sharp Moving Border Strip Covering Entire Border at Once ── */}
+          <div
+            className="absolute -inset-[1px] rounded-lg pointer-events-none p-[1.5px] overflow-hidden z-20 opacity-50"
+            style={{
+              mask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+              maskComposite: 'exclude',
+              WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+              WebkitMaskComposite: 'xor',
+            }}
+          >
+            <div
+              className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[max(200vw,2200px)] h-[max(200vw,2200px)]"
+              style={{
+                background:
+                  'conic-gradient(from 0deg, rgba(99, 102, 241, 0.4) 0%, rgba(168, 85, 247, 0.4) 25%, rgba(6, 182, 212, 0.4) 50%, rgba(168, 85, 247, 0.4) 75%, rgba(99, 102, 241, 0.4) 100%)',
+                animation: 'spinSlow 8s linear infinite',
+              }}
+            />
+          </div>
+
           {/* Brand Logo */}
           <button
             suppressHydrationWarning
             onClick={() => scrollTo('hero')}
-            className="flex items-center gap-2.5 py-0.5 rounded-full group cursor-pointer focus:outline-none"
+            className="flex items-center gap-2.5 py-0.5 rounded-lg group cursor-pointer focus:outline-none"
             aria-label="Scroll to top"
           >
             <div className="relative w-8 h-8 rounded-lg overflow-hidden border border-zinc-200/20 dark:border-zinc-800/80 flex items-center justify-center bg-zinc-900/50 group-hover:scale-105 group-hover:border-indigo-500/40 transition-all duration-300 shadow-sm">
@@ -166,11 +205,10 @@ export default function Navbar() {
                   suppressHydrationWarning
                   key={item.id}
                   onClick={() => scrollTo(item.id)}
-                  className={`relative py-0.5 text-sm font-medium transition-colors duration-200 cursor-pointer focus:outline-none ${
-                    isActive
+                  className={`relative py-0.5 text-sm font-medium transition-colors duration-200 cursor-pointer focus:outline-none ${isActive
                       ? 'text-indigo-600 dark:text-cyan-400 font-semibold'
                       : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white'
-                  }`}
+                    }`}
                 >
                   <span>{item.label}</span>
                   {isActive && (
@@ -258,7 +296,7 @@ export default function Navbar() {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -16, scale: 0.95 }}
               transition={{ duration: 0.25, ease: 'easeOut' }}
-              className="fixed top-16 sm:top-18 inset-x-4 max-w-sm mx-auto z-50 md:hidden glass !bg-white/95 dark:!bg-zinc-950/95 border border-zinc-200/80 dark:border-zinc-800/80 rounded-3xl p-4 shadow-2xl backdrop-blur-2xl"
+              className="fixed top-16 sm:top-18 inset-x-4 max-w-sm mx-auto z-50 md:hidden glass !bg-white/95 dark:!bg-zinc-950/95 border border-zinc-200/80 dark:border-zinc-800/80 rounded-xl p-4 shadow-2xl backdrop-blur-2xl"
             >
               <div className="flex flex-col gap-1">
                 {NAV_ITEMS.map((item, i) => {
@@ -270,11 +308,10 @@ export default function Navbar() {
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: i * 0.04, duration: 0.2 }}
                       onClick={() => scrollTo(item.id)}
-                      className={`flex items-center justify-between px-4 py-3 rounded-2xl font-medium text-base transition-all duration-200 text-left cursor-pointer active:scale-98 ${
-                        isActive
+                      className={`flex items-center justify-between px-4 py-3 rounded-2xl font-medium text-base transition-all duration-200 text-left cursor-pointer active:scale-98 ${isActive
                           ? 'bg-indigo-50 dark:bg-zinc-800/80 text-indigo-600 dark:text-cyan-400 font-semibold'
                           : 'text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100/70 dark:hover:bg-zinc-900/60'
-                      }`}
+                        }`}
                     >
                       <span>{item.label}</span>
                       {isActive && (
