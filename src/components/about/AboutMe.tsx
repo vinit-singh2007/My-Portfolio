@@ -155,6 +155,34 @@ export default function AboutMe() {
     };
   }, [reducedMotion]);
 
+  // Books auto-advance every 4s (paused when tab hidden or reduced motion)
+  useEffect(() => {
+    if (reducedMotion || BOOKS.length <= 1) return;
+
+    let timer: NodeJS.Timeout | null = null;
+    const startTimer = () => {
+      if (timer) clearInterval(timer);
+      timer = setInterval(() => {
+        setBookIndex((prev) => (prev + 1) % BOOKS.length);
+      }, 4000);
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        if (timer) clearInterval(timer);
+      } else {
+        startTimer();
+      }
+    };
+
+    startTimer();
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => {
+      if (timer) clearInterval(timer);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [reducedMotion]);
+
   /* ── 3. GitHub Contributions State (Card 6) ── */
   const [contributionsCount, setContributionsCount] = useState<number | null>(null);
   const [heatmapDays, setHeatmapDays] = useState<{ level: number; date?: string }[]>(() =>
@@ -259,6 +287,7 @@ export default function AboutMe() {
               target="_blank"
               rel="noopener noreferrer"
               aria-label="LinkedIn Profile"
+              suppressHydrationWarning
               className={`${styles.linkedInBadge} ${styles.focusOrange}`}
             >
               <LinkedInIcon />
@@ -275,6 +304,7 @@ export default function AboutMe() {
             href={LINKEDIN_URL}
             target="_blank"
             rel="noopener noreferrer"
+            suppressHydrationWarning
             className={`${styles.pillButton} ${styles.focusOrange}`}
           >
             <span>View LinkedIn</span>
@@ -316,6 +346,7 @@ export default function AboutMe() {
           {/* Play / Pause Toggle Button */}
           <button
             type="button"
+            suppressHydrationWarning
             onClick={() => setIsPlaying((prev) => !prev)}
             aria-pressed={isPlaying}
             className={`${styles.musicPill} ${styles.focusOrange}`}
@@ -333,60 +364,52 @@ export default function AboutMe() {
         </div>
 
         {/* ══════════════════════════════════════════
-            CARD 4: PHOTOS (Column 2, row 2)
+            CARD 4: BOOKS HOBBY (Column 2, row 2)
            ══════════════════════════════════════════ */}
-        <div className={`${styles.cardBase} ${styles.cardPhotos}`}>
-          {FOOD_IMAGES.length > 0 ? (
-            <>
-              {FOOD_IMAGES.map((src, idx) => (
-                <div
-                  key={src}
-                  className={styles.photoSlide}
-                  style={{
-                    opacity: idx === photoIndex ? 1 : 0,
-                    pointerEvents: idx === photoIndex ? 'auto' : 'none',
-                  }}
-                >
-                  <Image
-                    src={src}
-                    alt=""
-                    fill
-                    sizes="(max-width: 980px) 50vw, 30vw"
-                    priority={idx === 0}
-                    loading={idx === 0 ? 'eager' : 'lazy'}
-                    className="object-cover"
-                  />
-                </div>
-              ))}
+        <div className={`${styles.cardBase} ${styles.cardBooks}`} aria-label="Reading hobby">
+          {/* Label */}
+          <div className={styles.booksLabel}>Currently reading</div>
 
-              {/* Bottom gradient mask for contrast with indicator dots */}
+          {/* Book cover slides */}
+          <div className={styles.booksCoverArea} aria-hidden="true">
+            {BOOKS.map((book, idx) => (
               <div
-                className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/60 to-transparent pointer-events-none"
-                aria-hidden="true"
-              />
+                key={book.title}
+                className={styles.bookCoverWrapper}
+                style={{ opacity: idx === bookIndex ? 1 : 0 }}
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={book.cover}
+                  alt={book.title}
+                  className={styles.bookCoverImg}
+                  loading={idx === 0 ? 'eager' : 'lazy'}
+                />
+                {/* Soft shadow under book */}
+                <div className={styles.bookShadow} aria-hidden="true" />
+              </div>
+            ))}
+          </div>
 
-              {/* Indicator dots */}
-              {FOOD_IMAGES.length > 1 && (
-                <div className={styles.photoIndicatorRow} aria-hidden="true">
-                  {FOOD_IMAGES.map((_, dotIdx) => (
-                    <div
-                      key={dotIdx}
-                      className={styles.photoDot}
-                      style={{
-                        backgroundColor: dotIdx === photoIndex ? '#ffffff' : 'rgba(255, 255, 255, 0.33)',
-                      }}
-                    />
-                  ))}
-                </div>
-              )}
-            </>
-          ) : (
-            /* Neutral gradient fallback when folder/array is empty (Zero text) */
-            <div
-              className="w-full h-full min-h-[310px] bg-gradient-to-br from-[#1c1c20] via-[#151518] to-[#0c0c0e]"
-              aria-hidden="true"
-            />
-          )}
+          {/* Book info */}
+          <div className={styles.booksInfo}>
+            <div className={styles.booksTitle}>{BOOKS[bookIndex].title}</div>
+            <div className={styles.booksAuthor}>{BOOKS[bookIndex].author}</div>
+          </div>
+
+          {/* Dot indicators */}
+          <div className={styles.booksDots} aria-hidden="true">
+            {BOOKS.map((_, i) => (
+              <span
+                key={i}
+                className={styles.booksDot}
+                style={{
+                  opacity: i === bookIndex ? 1 : 0.28,
+                  transform: i === bookIndex ? 'scale(1.3)' : 'scale(1)',
+                }}
+              />
+            ))}
+          </div>
         </div>
 
         {/* ══════════════════════════════════════════
@@ -403,6 +426,7 @@ export default function AboutMe() {
             href={BLOG_URL}
             target="_blank"
             rel="noopener noreferrer"
+            suppressHydrationWarning
             className={`${styles.blogLink} ${styles.focusOrange}`}
           >
             <span>Latest build</span>
@@ -434,6 +458,7 @@ export default function AboutMe() {
               href={`https://github.com/${GITHUB_USERNAME}`}
               target="_blank"
               rel="noopener noreferrer"
+              suppressHydrationWarning
               className={`${styles.githubProfileLink} ${styles.focusOrange}`}
             >
               <span>{GITHUB_USERNAME} on GitHub</span>
