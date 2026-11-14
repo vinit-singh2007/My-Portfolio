@@ -50,6 +50,17 @@ export default function RootLayout({
       lang="en"
       className={`${inter.variable} ${jetbrainsMono.variable} ${dancingScript.variable} h-full antialiased dark`}
     >
+      {/*
+        Disable the browser's native scroll restoration so that refreshing
+        always starts at the very top of the page, not mid-page at Contact.
+      */}
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `history.scrollRestoration = 'manual'; window.scrollTo(0, 0);`,
+          }}
+        />
+      </head>
       <body className="min-h-full flex flex-col bg-[#0A0A0A] text-[#EDEDED] antialiased font-[var(--font-inter)] selection:bg-white/20 selection:text-white">
         {children}
       </body>

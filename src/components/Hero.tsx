@@ -89,9 +89,15 @@ export default function Hero() {
       }
     };
 
-    handleScroll();
+    // Delay the first call so all sections have finished laying out.
+    // Calling immediately on mount causes all offsetTops to read as 0,
+    // which makes the scroll-spy incorrectly set activeKey to 'contact'.
+    const initTimer = setTimeout(handleScroll, 300);
     window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
+    return () => {
+      clearTimeout(initTimer);
+      window.removeEventListener('scroll', handleScroll);
+    };
   }, []);
 
   const scrollTo = (id: string, key?: string) => {
