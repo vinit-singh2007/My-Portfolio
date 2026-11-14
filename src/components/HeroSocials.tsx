@@ -207,16 +207,16 @@ export default function HeroSocials() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label={social.ariaLabel}
-                className="relative w-[42px] h-[42px] rounded-full border border-white/[0.18] bg-[#111114]/80 backdrop-blur-sm flex items-center justify-center text-[#d4d4de] transition-all duration-350 ease-[cubic-bezier(0.2,0.8,0.2,1)] group-hover:bg-[#f97316] group-hover:border-[#f97316] group-hover:text-[#0a0a0a] group-hover:scale-[1.12] group-hover:shadow-[0_0_28px_rgba(249,115,22,0.5)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#f97316] focus-visible:ring-offset-[3px] focus-visible:ring-offset-[#0a0a0a] active:scale-95"
+                className="relative w-[42px] h-[42px] rounded-full border border-white/[0.18] bg-[#111114]/80 backdrop-blur-sm flex items-center justify-center text-[#d4d4de] transition-all duration-300 ease-[cubic-bezier(0.2,0.8,0.2,1)] group-hover:bg-white/[0.14] group-hover:border-white/50 group-hover:text-white group-hover:scale-[1.12] group-hover:shadow-[0_0_20px_rgba(255,255,255,0.12)] focus:outline-none focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:ring-offset-[3px] focus-visible:ring-offset-[#0a0a0a] active:scale-95"
               >
-                {/* Pulsing ring on hover */}
+                {/* Pulsing ring on hover (subtle white ring) */}
                 {!shouldReduceMotion && (
                   <span
-                    className="absolute inset-0 rounded-full border border-[#f97316] opacity-0 group-hover:animate-social-pulse pointer-events-none"
+                    className="absolute inset-0 rounded-full border border-white/30 opacity-0 group-hover:animate-social-pulse pointer-events-none"
                     aria-hidden="true"
                   />
                 )}
-                {social.icon('transition-colors duration-300')}
+                {social.icon('transition-colors duration-200')}
               </a>
             </motion.li>
           ))}
@@ -251,7 +251,7 @@ export default function HeroSocials() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label={social.ariaLabel}
-                className="w-10 h-10 rounded-full border border-white/[0.18] bg-[#111114]/80 backdrop-blur-sm flex items-center justify-center text-[#d4d4de] transition-colors active:bg-[#f97316] active:border-[#f97316] active:text-[#0a0a0a] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#f97316]"
+                className="w-10 h-10 rounded-full border border-white/[0.18] bg-[#111114]/80 backdrop-blur-sm flex items-center justify-center text-[#d4d4de] transition-colors active:bg-white/[0.15] active:border-white/50 active:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
               >
                 {social.icon('transition-colors duration-200')}
               </a>
