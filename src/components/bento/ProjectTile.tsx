@@ -60,6 +60,7 @@ export default function ProjectTile({
         ref={cardRef}
         role="button"
         tabIndex={0}
+        suppressHydrationWarning
         onClick={() => onOpenDetail(project)}
         onKeyDown={(e) => {
           if (e.key === 'Enter' || e.key === ' ') {
