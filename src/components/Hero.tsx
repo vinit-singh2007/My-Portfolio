@@ -13,7 +13,7 @@ const NAV_LINKS = [
   { key: 'about', label: 'About Me', targetId: 'skills' },
   { key: 'what-i-do', label: 'What I Do', targetId: 'projects' },
   { key: 'experience', label: 'My Experience', targetId: 'experience' },
-  { key: 'work', label: 'My Work', targetId: 'projects' },
+  { key: 'expertise', label: 'Expertise', targetId: 'skills' },
   { key: 'blog', label: 'Blog', targetId: 'blog' },
   { key: 'contact', label: 'Contact', targetId: 'contact' },
 ];
@@ -120,17 +120,12 @@ export default function Hero() {
         setActiveKey('contact');
       } else if (blogEl && scrollPosition >= blogEl.offsetTop) {
         setActiveKey('blog');
+      } else if (skillsEl && scrollPosition >= skillsEl.offsetTop) {
+        setActiveKey('expertise');
       } else if (experienceEl && scrollPosition >= experienceEl.offsetTop) {
         setActiveKey('experience');
-      } else if (skillsEl && scrollPosition >= skillsEl.offsetTop) {
-        setActiveKey('about');
       } else if (projectsEl && scrollPosition >= projectsEl.offsetTop) {
-        const halfProjects = projectsEl.offsetTop + projectsEl.offsetHeight * 0.45;
-        if (scrollPosition < halfProjects) {
-          setActiveKey('what-i-do');
-        } else {
-          setActiveKey('work');
-        }
+        setActiveKey('what-i-do');
       } else {
         setActiveKey('');
       }
@@ -258,8 +253,8 @@ export default function Hero() {
             <button onClick={() => scrollTo('experience')} className="py-2 text-xs font-semibold tracking-[0.2em] uppercase text-zinc-300 hover:text-white">
               MY EXPERIENCE
             </button>
-            <button onClick={() => scrollTo('projects')} className="py-2 text-xs font-semibold tracking-[0.2em] uppercase text-zinc-300 hover:text-white">
-              MY WORK
+            <button onClick={() => scrollTo('skills')} className="py-2 text-xs font-semibold tracking-[0.2em] uppercase text-zinc-300 hover:text-white">
+              EXPERTISE
             </button>
             <button onClick={() => scrollTo('blog')} className="py-2 text-xs font-semibold tracking-[0.2em] uppercase text-zinc-300 hover:text-white">
               BLOG
