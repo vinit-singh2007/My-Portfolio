@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, JetBrains_Mono, Dancing_Script } from "next/font/google";
 import Opening from "@/components/Opening";
-import SocialRail from "@/components/SocialRail";
 import "./globals.css";
 
 const inter = Inter({
@@ -65,7 +64,6 @@ export default function RootLayout({
       </head>
       <body className="min-h-full flex flex-col bg-[#0A0A0A] text-[#EDEDED] antialiased font-[var(--font-inter)] selection:bg-white/20 selection:text-white">
         <Opening />
-        <SocialRail />
         {children}
       </body>
     </html>

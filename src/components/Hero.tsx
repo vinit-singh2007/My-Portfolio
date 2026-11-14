@@ -6,7 +6,7 @@ import { Menu, X, ArrowUp, ArrowDown, ArrowRight, ExternalLink } from 'lucide-re
 import Image from 'next/image';
 import ThreeBackground from './ThreeBackground';
 import TextRollLink from './TextRollLink';
-import HeroSocials from './HeroSocials';
+import SocialRail from './SocialRail';
 import { playNavHoverSound, playNavClickSound } from '@/lib/navSound';
 
 const NAV_LINKS = [
@@ -332,8 +332,8 @@ export default function Hero() {
         </div>
       </div>
 
-      {/* ── Animated Social Links Rail (Right Side & Mobile) ── */}
-      <HeroSocials />
+      {/* ── Animated Social Links Rail (Right Side) ── */}
+      <SocialRail />
 
       {/* ── Bottom Section: Circular Navigation Controls & Indicators (Matching Video) ── */}
       <div className="relative z-20 w-full px-6 sm:px-12 lg:px-20 pb-8 sm:pb-12 flex items-center justify-between">
