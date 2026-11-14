@@ -125,17 +125,6 @@ export default function HeroSocials() {
     },
   };
 
-  const labelVariants: Variants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        duration: shouldReduceMotion ? 0 : 0.6,
-        delay: shouldReduceMotion ? 0 : 0.5,
-        ease: 'easeOut',
-      },
-    },
-  };
 
   const itemVariants: Variants = {
     hidden: { opacity: 0, x: shouldReduceMotion ? 0 : 26 },
@@ -165,17 +154,6 @@ export default function HeroSocials() {
           className="w-[1px] h-10 lg:h-16 bg-gradient-to-b from-transparent to-white/50 origin-top"
           aria-hidden="true"
         />
-
-        {/* Vertical FOLLOW Label */}
-        <motion.span
-          initial="hidden"
-          animate="visible"
-          variants={labelVariants}
-          className="font-mono text-[10px] tracking-[0.3em] text-[#8b8b99] [writing-mode:vertical-rl] select-none py-1"
-          aria-hidden="true"
-        >
-          FOLLOW
-        </motion.span>
 
         {/* Vertical Icon Buttons List */}
         <motion.ul
