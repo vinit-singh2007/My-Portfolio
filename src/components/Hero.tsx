@@ -355,7 +355,7 @@ export default function Hero() {
           >
             <button
               suppressHydrationWarning
-              onClick={() => scrollTo('projects')}
+              onClick={() => scrollTo('about')}
               className="group inline-flex items-center gap-2.5 text-xs uppercase tracking-[0.2em] font-semibold text-white hover:text-zinc-300 transition-colors cursor-pointer"
             >
               <span>Learn More</span>
@@ -394,14 +394,6 @@ export default function Hero() {
           >
             <ArrowDown className="w-4 h-4 stroke-[1.75]" />
           </motion.button>
-        </div>
-
-        {/* Bottom-Right: Section Counter */}
-        <div className="flex items-center">
-          {/* Section Indicator */}
-          <div className="text-xs font-mono tracking-[0.25em] text-zinc-400">
-            <span className="text-white font-bold">01</span> &nbsp;/&nbsp; 05
-          </div>
         </div>
       </div>
     </section>

@@ -140,31 +140,25 @@ export default function ContactInfo() {
             onMouseLeave={handleMouseLeave}
             style={
               {
-                '--card-color': '#f97316',
-                '--card-glow': 'rgba(249, 115, 22, 0.14)',
+                '--card-color': 'rgba(255, 255, 255, 0.4)',
+                '--card-glow': 'rgba(255, 255, 255, 0.08)',
               } as React.CSSProperties
             }
             className="contact-glow-card rounded-[16px] p-[14px_16px] flex items-center gap-[14px] relative"
           >
-            {/* Orange gradient icon tile */}
-            <div
-              className="w-[42px] h-[42px] rounded-[12px] flex items-center justify-center flex-shrink-0 shadow-sm relative z-10"
-              style={{
-                background:
-                  'linear-gradient(135deg, #f97316, color-mix(in srgb, #f97316 45%, white))',
-              }}
-            >
+            {/* Black and white icon tile */}
+            <div className="w-[42px] h-[42px] rounded-[12px] flex items-center justify-center flex-shrink-0 bg-white text-[#0a0a0a] shadow-sm relative z-10">
               <Mail className="w-5 h-5 text-[#0a0a0a] stroke-[2.2]" />
             </div>
 
             {/* Label and Value */}
             <div className="min-w-0 flex-1 relative z-10">
-              <span className="block font-mono text-[11px] tracking-[0.1em] uppercase font-semibold text-[#f97316]">
+              <span className="block font-mono text-[11px] tracking-[0.1em] uppercase font-semibold text-zinc-400">
                 EMAIL
               </span>
               <a
                 href="mailto:vinitsingh.builds@gmail.com"
-                className="text-sm font-semibold text-white hover:text-orange-200 transition-colors block [overflow-wrap:anywhere] break-all leading-snug"
+                className="text-sm font-semibold text-white hover:text-zinc-300 transition-colors block [overflow-wrap:anywhere] break-all leading-snug"
               >
                 vinitsingh.builds@gmail.com
               </a>
@@ -200,26 +194,20 @@ export default function ContactInfo() {
             onMouseLeave={handleMouseLeave}
             style={
               {
-                '--card-color': '#38bdf8',
-                '--card-glow': 'rgba(56, 189, 248, 0.14)',
+                '--card-color': 'rgba(255, 255, 255, 0.4)',
+                '--card-glow': 'rgba(255, 255, 255, 0.08)',
               } as React.CSSProperties
             }
             className="contact-glow-card rounded-[16px] p-[14px_16px] flex items-center gap-[14px] relative"
           >
-            {/* Sky blue gradient icon tile */}
-            <div
-              className="w-[42px] h-[42px] rounded-[12px] flex items-center justify-center flex-shrink-0 shadow-sm relative z-10"
-              style={{
-                background:
-                  'linear-gradient(135deg, #38bdf8, color-mix(in srgb, #38bdf8 45%, white))',
-              }}
-            >
+            {/* Black and white icon tile */}
+            <div className="w-[42px] h-[42px] rounded-[12px] flex items-center justify-center flex-shrink-0 bg-white text-[#0a0a0a] shadow-sm relative z-10">
               <MapPin className="w-5 h-5 text-[#0a0a0a] stroke-[2.2]" />
             </div>
 
             {/* Label and Value */}
             <div className="min-w-0 flex-1 relative z-10">
-              <span className="block font-mono text-[11px] tracking-[0.1em] uppercase font-semibold text-[#38bdf8]">
+              <span className="block font-mono text-[11px] tracking-[0.1em] uppercase font-semibold text-zinc-400">
                 LOCATION
               </span>
               <span className="text-sm font-semibold text-white block leading-snug">
