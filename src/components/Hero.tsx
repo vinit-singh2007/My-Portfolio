@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { Menu, X, ArrowUp, ArrowDown, ArrowRight, ExternalLink } from 'lucide-react';
 import Image from 'next/image';
 import ThreeBackground from './ThreeBackground';
@@ -17,14 +17,47 @@ const NAV_LINKS = [
   { key: 'contact', label: 'Contact', targetId: 'contact' },
 ];
 
+const FULL_TEXT =
+  'Tailored engineering solutions in high-performance web applications, scalable distributed backend architecture, and intelligent machine learning models.';
+const ORANGE_WORD = 'Tailored';
+const TYPING_SPEED_MS = 18;
+const TYPING_START_DELAY_MS = 500;
+
 export default function Hero() {
   const [mounted, setMounted] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeKey, setActiveKey] = useState('');
 
+  /* ── Typewriter ── */
+  const shouldReduceMotion = useReducedMotion();
+  const [displayedText, setDisplayedText] = useState('');
+  const [typingDone, setTypingDone] = useState(false);
+
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  /* ── Typewriter effect ── */
+  useEffect(() => {
+    if (shouldReduceMotion) {
+      setDisplayedText(FULL_TEXT);
+      setTypingDone(true);
+      return;
+    }
+    let i = 0;
+    const startTimer = setTimeout(() => {
+      const interval = setInterval(() => {
+        i++;
+        setDisplayedText(FULL_TEXT.slice(0, i));
+        if (i >= FULL_TEXT.length) {
+          clearInterval(interval);
+          setTypingDone(true);
+        }
+      }, TYPING_SPEED_MS);
+      return () => clearInterval(interval);
+    }, TYPING_START_DELAY_MS);
+    return () => clearTimeout(startTimer);
+  }, [shouldReduceMotion]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -207,15 +240,23 @@ export default function Hero() {
             Full Stack Engineer & AI Systems Developer
           </motion.h2>
 
-          {/* Tailored Solutions Description (Matching Video Content Structure) */}
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="text-sm sm:text-base text-zinc-400 font-light leading-relaxed max-w-xl"
-          >
-            Tailored engineering solutions in high-performance web applications, scalable distributed backend architecture, and intelligent machine learning models.
-          </motion.p>
+          {/* Tailored Solutions Description — typewriter */}
+          <p className="text-sm sm:text-base text-zinc-400 font-light leading-relaxed max-w-xl min-h-[4em]">
+            {displayedText.length > 0 && (
+              <>
+                <span className="text-[#f97316]">
+                  {displayedText.slice(0, Math.min(displayedText.length, ORANGE_WORD.length))}
+                </span>
+                {displayedText.slice(ORANGE_WORD.length)}
+              </>
+            )}
+            {!typingDone && (
+              <span
+                className="inline-block w-[2px] h-[1em] bg-zinc-400 ml-0.5 animate-pulse align-middle"
+                aria-hidden="true"
+              />
+            )}
+          </p>
 
           {/* Action Link: Learn More (Matching Video Reference) */}
           <motion.div
