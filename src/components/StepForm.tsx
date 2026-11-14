@@ -61,21 +61,27 @@ export default function StepForm({
     }
   }, [form.subject]);
 
-  // Auto-focus when step changes (skip step 3 unless custom input is active)
+  const isFirstMount = useRef(true);
+
+  // Auto-focus when step changes (skip on initial mount so page doesn't scroll to contact!)
   useEffect(() => {
+    if (isFirstMount.current) {
+      isFirstMount.current = false;
+      return;
+    }
     if (step === 1) {
-      nameInputRef.current?.focus();
+      nameInputRef.current?.focus({ preventScroll: true });
     } else if (step === 2) {
-      emailInputRef.current?.focus();
+      emailInputRef.current?.focus({ preventScroll: true });
     } else if (step === 4) {
-      messageRef.current?.focus();
+      messageRef.current?.focus({ preventScroll: true });
     }
   }, [step]);
 
   // When "Something else" is selected, focus the custom subject input
   useEffect(() => {
     if (step === 3 && selectedChip === 'Something else') {
-      customSubjectRef.current?.focus();
+      customSubjectRef.current?.focus({ preventScroll: true });
     }
   }, [step, selectedChip]);
 

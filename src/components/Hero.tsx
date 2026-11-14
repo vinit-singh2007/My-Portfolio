@@ -7,6 +7,7 @@ import Image from 'next/image';
 import ThreeBackground from './ThreeBackground';
 import TextRollLink from './TextRollLink';
 import HeroSocials from './HeroSocials';
+import { playNavHoverSound, playNavClickSound } from '@/lib/navSound';
 
 const NAV_LINKS = [
   { key: 'about', label: 'About Me', targetId: 'skills' },
@@ -27,6 +28,52 @@ export default function Hero() {
   const [mounted, setMounted] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeKey, setActiveKey] = useState('');
+
+  const navRef = useRef<HTMLElement>(null);
+  const mobileNavRef = useRef<HTMLDivElement>(null);
+
+  /* ── Soft Navbar Sound Listeners ── */
+  useEffect(() => {
+    const attachListeners = (el: HTMLElement | null) => {
+      if (!el) return () => { };
+      const handleMouseOver = (e: MouseEvent) => {
+        const btn = (e.target as HTMLElement).closest('button, a');
+        if (btn && el.contains(btn)) {
+          playNavHoverSound();
+        }
+      };
+      const handleFocusIn = (e: FocusEvent) => {
+        const btn = (e.target as HTMLElement).closest('button, a');
+        if (btn && el.contains(btn)) {
+          playNavHoverSound();
+        }
+      };
+      const handleClick = (e: MouseEvent) => {
+        const btn = (e.target as HTMLElement).closest('button, a');
+        if (btn && el.contains(btn)) {
+          playNavClickSound();
+        }
+      };
+
+      el.addEventListener('mouseover', handleMouseOver);
+      el.addEventListener('focusin', handleFocusIn);
+      el.addEventListener('click', handleClick);
+
+      return () => {
+        el.removeEventListener('mouseover', handleMouseOver);
+        el.removeEventListener('focusin', handleFocusIn);
+        el.removeEventListener('click', handleClick);
+      };
+    };
+
+    const cleanupDesktop = attachListeners(navRef.current);
+    const cleanupMobile = attachListeners(mobileNavRef.current);
+
+    return () => {
+      cleanupDesktop();
+      cleanupMobile();
+    };
+  }, [mobileMenuOpen]);
 
   /* ── Typewriter ── */
   const shouldReduceMotion = useReducedMotion();
@@ -155,7 +202,7 @@ export default function Hero() {
         </button>
 
         {/* Centered / Right Navigation Links with Text Roll Hover Animation */}
-        <nav className="hidden md:flex items-center gap-10 lg:gap-12">
+        <nav ref={navRef} className="hidden md:flex items-center gap-10 lg:gap-12">
           {NAV_LINKS.map((link) =>
             link.key === 'contact' ? (
               <button
@@ -195,6 +242,7 @@ export default function Hero() {
       <AnimatePresence>
         {mobileMenuOpen && (
           <motion.div
+            ref={mobileNavRef}
             initial={{ opacity: 0, y: -16 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -16 }}
@@ -233,7 +281,7 @@ export default function Hero() {
             transition={{ duration: 0.8, delay: 0.1 }}
             className="text-4xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-white leading-[1.08]"
           >
-            Vinit Singh
+            YO I'M VINIT
           </motion.h1>
 
           {/* Subtitle & Role */}
