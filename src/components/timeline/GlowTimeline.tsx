@@ -107,7 +107,7 @@ export default function GlowTimeline() {
   return (
     <div
       ref={containerRef}
-      className="relative w-full max-w-5xl mx-auto py-10 px-4 sm:px-6 overflow-hidden"
+      className="relative w-full max-w-5xl mx-auto py-10 px-0 overflow-hidden"
     >
       {/* ── Background Detail 1: Subtle Drifting Ambient Glows ── */}
       {!shouldReduceMotion && (

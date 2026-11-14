@@ -1,22 +1,11 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
-import { Menu, X, ArrowUp, ArrowDown, ArrowRight, ExternalLink } from 'lucide-react';
+import { motion, useReducedMotion } from 'framer-motion';
+import { ArrowUp, ArrowDown, ArrowRight } from 'lucide-react';
 import ThreeBackground from './ThreeBackground';
-import TextRollLink from './TextRollLink';
 import SocialRail from './SocialRail';
-import { playNavHoverSound, playNavClickSound } from '@/lib/navSound';
 import { onOpeningReveal } from '@/lib/openingState';
-
-const NAV_LINKS = [
-  { key: 'about', label: 'What I Am About', targetId: 'about' },
-  { key: 'what-i-do', label: 'What I Do', targetId: 'projects' },
-  { key: 'experience', label: 'My Experience', targetId: 'experience' },
-  { key: 'expertise', label: 'Expertise', targetId: 'skills' },
-  { key: 'blog', label: 'Blog', targetId: 'blog' },
-  { key: 'contact', label: 'Contact', targetId: 'contact' },
-];
 
 const FULL_HEADLINE = "YO I'M VINIT";
 const FULL_SUBTITLE = 'Full Stack Engineer & AI Systems Developer';
@@ -28,55 +17,6 @@ const TYPING_START_DELAY_MS = 500;
 
 export default function Hero() {
   const [mounted, setMounted] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [activeKey, setActiveKey] = useState('');
-
-  const navRef = useRef<HTMLElement>(null);
-  const mobileNavRef = useRef<HTMLDivElement>(null);
-
-  /* ── Soft Navbar Sound Listeners ── */
-  useEffect(() => {
-    const attachListeners = (el: HTMLElement | null) => {
-      if (!el) return () => { };
-      const handleMouseOver = (e: MouseEvent) => {
-        const btn = (e.target as HTMLElement).closest('button, a');
-        if (btn && el.contains(btn)) {
-          playNavHoverSound();
-        }
-      };
-      const handleFocusIn = (e: FocusEvent) => {
-        const btn = (e.target as HTMLElement).closest('button, a');
-        if (btn && el.contains(btn)) {
-          playNavHoverSound();
-        }
-      };
-      const handleClick = (e: MouseEvent) => {
-        const btn = (e.target as HTMLElement).closest('button, a');
-        if (btn && el.contains(btn)) {
-          playNavClickSound();
-        }
-      };
-
-      el.addEventListener('mouseover', handleMouseOver);
-      el.addEventListener('focusin', handleFocusIn);
-      el.addEventListener('click', handleClick);
-
-      return () => {
-        el.removeEventListener('mouseover', handleMouseOver);
-        el.removeEventListener('focusin', handleFocusIn);
-        el.removeEventListener('click', handleClick);
-      };
-    };
-
-    const cleanupDesktop = attachListeners(navRef.current);
-    const cleanupMobile = attachListeners(mobileNavRef.current);
-
-    return () => {
-      cleanupDesktop();
-      cleanupMobile();
-    };
-  }, [mobileMenuOpen]);
-
   /* ── Typewriter state for all 3 hero texts ── */
   const shouldReduceMotion = useReducedMotion();
   const [displayedHeadline, setDisplayedHeadline] = useState('');
@@ -161,48 +101,7 @@ export default function Hero() {
     };
   }, [shouldReduceMotion]);
 
-  useEffect(() => {
-    const handleScroll = () => {
-      const scrollPosition = window.scrollY + 160;
-
-      const contactEl = document.getElementById('contact');
-      const blogEl = document.getElementById('blog');
-      const experienceEl = document.getElementById('experience');
-      const skillsEl = document.getElementById('skills');
-      const projectsEl = document.getElementById('projects');
-      const aboutEl = document.getElementById('about');
-
-      if (contactEl && scrollPosition >= contactEl.offsetTop) {
-        setActiveKey('contact');
-      } else if (blogEl && scrollPosition >= blogEl.offsetTop) {
-        setActiveKey('blog');
-      } else if (skillsEl && scrollPosition >= skillsEl.offsetTop) {
-        setActiveKey('expertise');
-      } else if (experienceEl && scrollPosition >= experienceEl.offsetTop) {
-        setActiveKey('experience');
-      } else if (projectsEl && scrollPosition >= projectsEl.offsetTop) {
-        setActiveKey('what-i-do');
-      } else if (aboutEl && scrollPosition >= aboutEl.offsetTop) {
-        setActiveKey('about');
-      } else {
-        setActiveKey('');
-      }
-    };
-
-    // Delay the first call so all sections have finished laying out.
-    // Calling immediately on mount causes all offsetTops to read as 0,
-    // which makes the scroll-spy incorrectly set activeKey to 'contact'.
-    const initTimer = setTimeout(handleScroll, 300);
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => {
-      clearTimeout(initTimer);
-      window.removeEventListener('scroll', handleScroll);
-    };
-  }, []);
-
-  const scrollTo = (id: string, key?: string) => {
-    if (key) setActiveKey(key);
-    setMobileMenuOpen(false);
+  const scrollTo = (id: string) => {
     const element = document.getElementById(id);
     if (element) {
       const offsetTop =
@@ -233,71 +132,8 @@ export default function Hero() {
         <div className="absolute bottom-0 inset-x-0 h-32 bg-gradient-to-t from-[#0A0A0A] to-transparent pointer-events-none" />
       </div>
 
-      {/* ── Top Header Navigation Bar ── */}
-      <header className="relative z-30 w-full px-6 sm:px-12 lg:px-20 pt-8 sm:pt-10 flex items-center justify-center">
-        {/* Centered Navigation Links with Text Roll Hover Animation */}
-        <nav ref={navRef} className="hidden md:flex items-center justify-center gap-10 lg:gap-12">
-          {NAV_LINKS.map((link) => (
-            <TextRollLink
-              key={link.key}
-              label={link.label}
-              isActive={activeKey === link.key}
-              onClick={() => scrollTo(link.targetId, link.key)}
-            />
-          ))}
-        </nav>
-
-        {/* Mobile Menu Trigger */}
-        <div className="flex items-center md:hidden absolute right-6 sm:right-12 top-8 sm:top-10">
-          <button
-            suppressHydrationWarning
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="p-2 rounded-full border border-white/[0.08] bg-white/[0.04] text-zinc-300 hover:text-white cursor-pointer"
-            aria-label="Toggle menu"
-          >
-            {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-          </button>
-        </div>
-      </header>
-
-      {/* Mobile Menu Dropdown */}
-      <AnimatePresence>
-        {mobileMenuOpen && (
-          <motion.div
-            ref={mobileNavRef}
-            initial={{ opacity: 0, y: -16 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -16 }}
-            transition={{ duration: 0.2 }}
-            className="md:hidden absolute top-24 inset-x-6 z-50 p-6 rounded-2xl bg-[#111111]/95 border border-white/10 backdrop-blur-xl shadow-2xl flex flex-col gap-4 text-center"
-          >
-            <button onClick={() => scrollTo('about')} className="py-2 text-xs font-semibold tracking-[0.2em] uppercase text-zinc-300 hover:text-white">
-              suppressHydrationWarning
-              WHAT I AM ABOUT
-            </button>
-            <button onClick={() => scrollTo('projects')} className="py-2 text-xs font-semibold tracking-[0.2em] uppercase text-zinc-300 hover:text-white">
-              suppressHydrationWarning
-              WHAT I DO
-            </button>
-            <button onClick={() => scrollTo('experience')} className="py-2 text-xs font-semibold tracking-[0.2em] uppercase text-zinc-300 hover:text-white">
-              suppressHydrationWarning
-              MY EXPERIENCE
-            </button>
-            <button onClick={() => scrollTo('skills')} className="py-2 text-xs font-semibold tracking-[0.2em] uppercase text-zinc-300 hover:text-white">
-              suppressHydrationWarning
-              EXPERTISE
-            </button>
-            <button onClick={() => scrollTo('blog')} className="py-2 text-xs font-semibold tracking-[0.2em] uppercase text-zinc-300 hover:text-white">
-              suppressHydrationWarning
-              BLOG
-            </button>
-            <button onClick={() => scrollTo('contact')} className="py-2 text-xs font-semibold tracking-[0.2em] uppercase text-zinc-300 hover:text-white">
-              suppressHydrationWarning
-              CONTACT
-            </button>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Spacer for fixed top navbar */}
+      <div className="w-full h-16 sm:h-20 pointer-events-none" />
 
       {/* ── Main Landing Content (Exact Layout from Video Reference) ── */}
       <div className="relative z-10 w-full max-w-7xl mx-auto px-6 sm:px-12 lg:px-20 py-16 sm:py-24 flex-1 flex flex-col justify-center">

@@ -1,3 +1,4 @@
+import Navbar from '@/components/Navbar';
 import Hero from '@/components/Hero';
 import Projects from '@/components/Projects';
 import AboutMe from '@/components/about/AboutMe';
@@ -11,6 +12,7 @@ import StackedSections from '@/components/StackedSections';
 export default function Home() {
   return (
     <>
+      <Navbar />
       <main className="flex-grow">
         <StackedSections
           hero={<Hero />}

@@ -653,6 +653,14 @@
   }
 }
 
+@media (max-width: 768px) {
+  .cardMusic,
+  .cardPhotos,
+  .cardBlog {
+    display: none !important;
+  }
+}
+
 @media (max-width: 600px) {
   .bentoGrid {
     grid-template-columns: 1fr;
@@ -668,15 +676,8 @@
   }
 
   .cardProfile,
-  .cardMusic,
-  .cardPhotos,
-  .cardBlog,
   .cardGithub {
     grid-column: 1;
-  }
-
-  .cardPhotos {
-    padding: 0 !important;
   }
 }
 

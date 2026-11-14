@@ -35,12 +35,6 @@
   user-select: none;
 }
 
-@media (max-width: 599px) {
-  .rail {
-    right: 10px;
-  }
-}
-
 /* ── Top and Bottom Lines ── */
 .topLine,
 .bottomLine {
@@ -188,5 +182,51 @@
     transform: none !important;
     pointer-events: auto !important;
     transition: none !important;
+  }
+}
+
+/* ── Mobile Layout (<= 768px): Strictly Horizontal Row in Upper Left ── */
+@media (max-width: 768px) {
+  .rail {
+    position: absolute !important;
+    left: clamp(20px, 5vw, 28px) !important;
+    right: auto !important;
+    top: 28px !important;
+    transform: none !important;
+    height: auto !important;
+    width: auto !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    z-index: 35 !important;
+    pointer-events: auto !important;
+  }
+
+  .topLine,
+  .bottomLine {
+    display: none !important;
+  }
+
+  .gapBox {
+    position: static !important;
+    width: auto !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  .iconList {
+    position: static !important;
+    display: flex !important;
+    flex-direction: row !important;
+    width: auto !important;
+    height: auto !important;
+    padding: 0 !important;
+    gap: 10px !important;
+  }
+
+  .iconLink {
+    width: 38px !important;
+    height: 38px !important;
+    border-radius: 11px !important;
+    pointer-events: auto !important;
   }
 }
