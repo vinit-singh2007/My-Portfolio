@@ -6,7 +6,7 @@ import ProjectsBento from './bento/ProjectsBento';
 
 export default function Projects() {
   return (
-    <section id="projects" className="pt-0 pb-24 px-4 sm:px-6 max-w-7xl mx-auto relative select-none">
+    <section id="projects" className="pt-8 sm:pt-14 pb-24 px-4 sm:px-6 max-w-7xl mx-auto relative select-none">
       {/* ── Section Heading & Subtitle ── */}
       <div className="text-center mb-12 sm:mb-16">
         <motion.p

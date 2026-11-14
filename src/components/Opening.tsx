@@ -2,6 +2,15 @@
 
 import React, { useState, useEffect } from 'react';
 import { setOpeningActive } from '@/lib/navSound';
+import { setOpeningState } from '@/lib/openingState';
+
+declare global {
+  interface Window {
+    __OPENING_ACTIVE__?: boolean;
+    __OPENING_SPLITTING__?: boolean;
+    __OPENING_DONE__?: boolean;
+  }
+}
 
 const MONTHS = [
   'JAN',
@@ -50,6 +59,12 @@ export default function Opening() {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       setIsDone(true);
       setOpeningActive(false);
+      setOpeningState({ active: false, splitting: true });
+      if (typeof window !== 'undefined') {
+        window.__OPENING_ACTIVE__ = false;
+        window.__OPENING_DONE__ = true;
+        window.dispatchEvent(new CustomEvent('opening-reveal'));
+      }
       return;
     }
 
@@ -57,12 +72,23 @@ export default function Opening() {
     if (window.location.pathname !== '/') {
       setIsDone(true);
       setOpeningActive(false);
+      setOpeningState({ active: false, splitting: true });
+      if (typeof window !== 'undefined') {
+        window.__OPENING_ACTIVE__ = false;
+        window.__OPENING_DONE__ = true;
+        window.dispatchEvent(new CustomEvent('opening-reveal'));
+      }
       return;
     }
 
     // Lock scrolling while opening sequence plays
     document.body.style.overflow = 'hidden';
     setOpeningActive(true);
+    setOpeningState({ active: true, splitting: false });
+    if (typeof window !== 'undefined') {
+      window.__OPENING_ACTIVE__ = true;
+      window.__OPENING_DONE__ = false;
+    }
 
     // Initial update with accurate visitor local time
     const now = new Date();
@@ -82,6 +108,12 @@ export default function Opening() {
     // 2 & 3. Hold for 2.6s in total, then split from middle
     const splitTimer = setTimeout(() => {
       setIsSplitting(true);
+      setOpeningState({ active: true, splitting: true });
+      if (typeof window !== 'undefined') {
+        window.__OPENING_SPLITTING__ = true;
+        window.dispatchEvent(new CustomEvent('opening-split'));
+        window.dispatchEvent(new CustomEvent('opening-reveal'));
+      }
     }, 2600);
 
     // 4 & 5. After split finishes (1.3s duration), remove overlay and restore scroll
@@ -89,6 +121,12 @@ export default function Opening() {
       setIsDone(true);
       document.body.style.overflow = '';
       setOpeningActive(false);
+      setOpeningState({ active: false, splitting: true });
+      if (typeof window !== 'undefined') {
+        window.__OPENING_ACTIVE__ = false;
+        window.__OPENING_DONE__ = true;
+        window.dispatchEvent(new CustomEvent('opening-done'));
+      }
       clearInterval(clockInterval);
     }, 3950);
 

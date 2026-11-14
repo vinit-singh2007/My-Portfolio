@@ -106,6 +106,7 @@ export default function ProjectsBento() {
               tabIndex={0}
               aria-expanded={isOpen}
               aria-label={`${project.title}${isOpen ? ' (Expanded)' : ''}`}
+              suppressHydrationWarning
               onClick={() => handlePanelClick(project)}
               onMouseEnter={() => setOpenId(project.id)}
               onFocus={() => setOpenId(project.id)}
@@ -181,6 +182,7 @@ export default function ProjectsBento() {
                 <div className="flex flex-wrap items-center gap-2.5 pt-1">
                   <button
                     type="button"
+                    suppressHydrationWarning
                     onClick={(e) => {
                       e.stopPropagation();
                       setSelectedProject(project);
@@ -196,6 +198,7 @@ export default function ProjectsBento() {
                       href={project.demo}
                       target="_blank"
                       rel="noopener noreferrer"
+                      suppressHydrationWarning
                       onClick={(e) => e.stopPropagation()}
                       className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-white/20 hover:border-white/50 text-white text-xs font-medium tracking-wide transition-colors cursor-pointer bg-black/40 backdrop-blur-sm active:scale-95"
                       aria-label={`Live demo for ${project.title}`}
@@ -210,6 +213,7 @@ export default function ProjectsBento() {
                       href={project.repo}
                       target="_blank"
                       rel="noopener noreferrer"
+                      suppressHydrationWarning
                       onClick={(e) => e.stopPropagation()}
                       className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-white/20 hover:border-white/50 text-white text-xs font-medium tracking-wide transition-colors cursor-pointer bg-black/40 backdrop-blur-sm active:scale-95"
                       aria-label={`GitHub repository for ${project.title}`}

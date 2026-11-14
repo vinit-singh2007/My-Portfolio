@@ -2,10 +2,11 @@
 
 import React, { useState, useEffect } from 'react';
 import styles from './SocialRail.module.css';
+import { onOpeningReveal } from '@/lib/openingState';
 
 /* ── CONFIGURABLE SOCIAL URL CONSTANTS (Edit as needed) ── */
 export const SOCIAL_URLS = {
-  LINKEDIN_URL: 'https://linkedin.com/in/vinitsi-2043-',
+  LINKEDIN_URL: 'https://www.linkedin.com/in/vinitsi-2043-',
   GITHUB_URL: 'https://github.com/vinit-singh2007',
   X_URL: 'https://x.com/AxeVinSi',
 };
@@ -13,18 +14,19 @@ export const SOCIAL_URLS = {
 // Module-level guard: ensures animation only plays on full page load, not in-app route changes
 let hasAnimatedOnce = false;
 
-/* ── 20px Brand SVG Icons (Filled with currentColor) ── */
+/* ── 17px Brand SVG Icons (Filled with currentColor) ── */
 function LinkedInIcon() {
   return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-      <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.46 10.9h2.79v8.37H6.46v-8.37M7.86 6.81a1.62 1.62 0 1 0 0 3.24 1.62 1.62 0 0 0 0-3.24Z" />
+    <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <circle cx="4.983" cy="5.009" r="2.188" />
+      <path d="M9.237 8.855v12.139h3.769v-6.003c0-1.584.302-3.118 2.27-3.118 1.94 0 1.966 1.815 1.966 3.221v5.9h3.771v-6.657c0-3.27-.704-5.783-4.524-5.783-1.835 0-3.064 1.008-3.567 1.96h-.051V8.855H9.237zM3.098 8.855h3.769v12.139H3.098z" />
     </svg>
   );
 }
 
 function GitHubIcon() {
   return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+    <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
       <path
         fillRule="evenodd"
         clipRule="evenodd"
@@ -36,7 +38,7 @@ function GitHubIcon() {
 
 function XIcon() {
   return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+    <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
       <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
     </svg>
   );
@@ -58,26 +60,44 @@ export default function SocialRail() {
       return;
     }
 
-    // Step 1: 150ms -> both lines draw in from center outward
-    const t1 = setTimeout(() => setAnimState('lines'), 150);
+    let t1: NodeJS.Timeout | null = null;
+    let t2: NodeJS.Timeout | null = null;
+    let t3: NodeJS.Timeout | null = null;
+    let t4: NodeJS.Timeout | null = null;
+    let fallbackTimer: NodeJS.Timeout | null = null;
+    let started = false;
 
-    // Step 2: 1250ms -> the split, middle gap expands to 204px
-    const t2 = setTimeout(() => setAnimState('split'), 1250);
+    const startRailAnimation = () => {
+      if (started) return;
+      started = true;
 
-    // Step 3: 1900ms -> icons appear with stagger
-    const t3 = setTimeout(() => setAnimState('icons'), 1900);
+      // Step 1: 150ms -> both lines draw in from center outward
+      t1 = setTimeout(() => setAnimState('lines'), 150);
 
-    // Step 4: 3000ms -> animation done, staggers cleared, pointer-events enabled
-    const t4 = setTimeout(() => {
-      hasAnimatedOnce = true;
-      setAnimState('done');
-    }, 3000);
+      // Step 2: 1250ms -> the split, middle gap expands
+      t2 = setTimeout(() => setAnimState('split'), 1250);
+
+      // Step 3: 1900ms -> icons appear with stagger
+      t3 = setTimeout(() => setAnimState('icons'), 1900);
+
+      // Step 4: 3000ms -> animation done, staggers cleared, pointer-events enabled
+      t4 = setTimeout(() => {
+        hasAnimatedOnce = true;
+        setAnimState('done');
+      }, 3000);
+    };
+
+    // Start rail animation right as the opening splits into view
+    const unsubscribeReveal = onOpeningReveal(() => {
+      startRailAnimation();
+    });
 
     return () => {
-      clearTimeout(t1);
-      clearTimeout(t2);
-      clearTimeout(t3);
-      clearTimeout(t4);
+      unsubscribeReveal();
+      if (t1) clearTimeout(t1);
+      if (t2) clearTimeout(t2);
+      if (t3) clearTimeout(t3);
+      if (t4) clearTimeout(t4);
     };
   }, []);
 

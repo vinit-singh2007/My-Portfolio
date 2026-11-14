@@ -1,4 +1,6 @@
 import { NextResponse } from 'next/server';
+import fs from 'fs';
+import path from 'path';
 
 export const revalidate = 3600; // Cache for 1 hour
 
@@ -9,7 +11,23 @@ export async function GET(request: Request) {
     process.env.GITHUB_USERNAME ||
     'vinit-singh2007';
 
-  const token = process.env.GITHUB_TOKEN;
+  let token = process.env.GITHUB_TOKEN;
+
+  // Fallback to read .env.local directly if process.env wasn't updated without a server restart
+  if (!token) {
+    try {
+      const envPath = path.join(process.cwd(), '.env.local');
+      if (fs.existsSync(envPath)) {
+        const envContent = fs.readFileSync(envPath, 'utf8');
+        const match = envContent.match(/^GITHUB_TOKEN=(.+)$/m);
+        if (match) {
+          token = match[1].trim();
+        }
+      }
+    } catch {
+      // ignore
+    }
+  }
 
   if (!token) {
     return NextResponse.json(
@@ -28,9 +46,9 @@ export async function GET(request: Request) {
   }
 
   const query = `
-    query($username: String!) {
+    query($username: String!, $from: DateTime!, $to: DateTime!) {
       user(login: $username) {
-        contributionsCollection {
+        contributionsCollection(from: $from, to: $to) {
           contributionCalendar {
             totalContributions
             weeks {
@@ -46,6 +64,11 @@ export async function GET(request: Request) {
     }
   `;
 
+  // Current year range
+  const now = new Date();
+  const yearStart = new Date(now.getFullYear(), 0, 1).toISOString();
+  const yearEnd = now.toISOString();
+
   try {
     const res = await fetch('https://api.github.com/graphql', {
       method: 'POST',
@@ -54,7 +77,7 @@ export async function GET(request: Request) {
         'Content-Type': 'application/json',
         'User-Agent': 'Portfolio-AboutMe',
       },
-      body: JSON.stringify({ query, variables: { username } }),
+      body: JSON.stringify({ query, variables: { username, from: yearStart, to: yearEnd } }),
       next: { revalidate: 3600 },
     });
 

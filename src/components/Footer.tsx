@@ -78,6 +78,7 @@ export default function Footer() {
             aria-label="Footer navigation"
           >
             <button
+              suppressHydrationWarning
               type="button"
               onClick={() => scrollTo('skills')}
               className="footer-nav-link focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 rounded px-1 -mx-1"
@@ -85,6 +86,7 @@ export default function Footer() {
               Skills
             </button>
             <button
+              suppressHydrationWarning
               type="button"
               onClick={() => scrollTo('projects')}
               className="footer-nav-link focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 rounded px-1 -mx-1"
@@ -92,6 +94,7 @@ export default function Footer() {
               Projects
             </button>
             <button
+              suppressHydrationWarning
               type="button"
               onClick={() => scrollTo('experience')}
               className="footer-nav-link focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 rounded px-1 -mx-1"
@@ -99,6 +102,7 @@ export default function Footer() {
               Work History
             </button>
             <button
+              suppressHydrationWarning
               type="button"
               onClick={() => scrollTo('contact')}
               className="footer-nav-link focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 rounded px-1 -mx-1"

@@ -5,15 +5,33 @@ import Image from 'next/image';
 import styles from './AboutMe.module.css';
 
 /* ── CONFIGURABLE USER CONSTANTS (Edit as needed) ── */
-export const LINKEDIN_URL = 'https://linkedin.com/in/vinitsi-2043-';
+export const LINKEDIN_URL = 'https://www.linkedin.com/in/vinitsi-2043-';
 export const BLOG_URL = 'https://github.com/vinit-singh2007';
 export const GITHUB_USERNAME = 'vinit-singh2007';
+
+/**
+ * Latest build card — update this whenever you ship something new.
+ * `tag` is a small label shown above the title (e.g. "Project", "Blog", "Side build").
+ */
+export const LATEST_BUILD = {
+  tag: 'Project',
+  title: 'Day 0',
+  description:
+    'A career simulation platform that helps students and freshers experience real work before their first job.',
+  url: 'https://day-0-delta.vercel.app/',
+};
 
 /**
  * Array of food image paths in /images/food/ (e.g. ['/images/food/food-1.jpg', ...]).
  * If empty, the Photos card displays a clean neutral gradient with zero text.
  */
-export const FOOD_IMAGES: string[] = [];
+export const FOOD_IMAGES: string[] = [
+  'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=700&q=85&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=700&q=85&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=700&q=85&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=700&q=85&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=700&q=85&auto=format&fit=crop',
+];
 
 /**
  * Books hobby slideshow — Open Library cover CDN URLs.
@@ -55,8 +73,13 @@ const BOOKS: { title: string; author: string; cover: string }[] = [
 /* ── INLINE ICONS ── */
 function LinkedInIcon() {
   return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-      <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.46 10.9h2.79v8.37H6.46v-8.37M7.86 6.81a1.62 1.62 0 1 0 0 3.24 1.62 1.62 0 0 0 0-3.24Z" />
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
+      {/* Dot */}
+      <circle cx="4.98" cy="5.01" r="2.48" />
+      {/* Left bar */}
+      <rect x="3" y="9.5" width="4" height="13.5" />
+      {/* Right column */}
+      <path d="M13.32 9.5h-4v13.5h4v-7.1c0-1.9 1.56-3.44 3.5-3.44s3.5 1.54 3.5 3.44v7.1h4v-7.86C24.32 11.6 20.9 9 17.18 9c-1.6 0-3.07.57-4.18 1.5V9.5z" />
     </svg>
   );
 }
@@ -204,12 +227,12 @@ export default function AboutMe() {
         }
 
         if (Array.isArray(data.days) && data.days.length > 0) {
-          // Normalize to exactly 371 days (53 weeks)
-          const days = data.days.slice(-371);
+          // Normalize to exactly 371 days (53 weeks), keeping start of year on the left and future days on the right
+          const days = [...data.days];
           while (days.length < 371) {
-            days.unshift({ level: 0 });
+            days.push({ level: 0 });
           }
-          setHeatmapDays(days);
+          setHeatmapDays(days.slice(0, 371));
         }
       } catch {
         // Leave level 0 cells and hide count
@@ -236,29 +259,41 @@ export default function AboutMe() {
               {/* 1. Where I'm from */}
               <div>
                 <div className={styles.sectionLabel}>Where I&apos;m from</div>
-                <p className={styles.sectionText}>[REPLACE WITH MY CITY AND COUNTRY LINE]</p>
+                <p className={styles.sectionText}>MUMBAI,INDIA</p>
               </div>
 
               {/* 2. What I do */}
               <div>
                 <div className={styles.sectionLabel}>What I do</div>
                 <p className={styles.sectionText}>
-                  I build full-stack and AI/ML projects.{' '}
-                  <strong className={styles.strongText}>Day 0</strong> is a career simulation platform
-                  for students and freshers.{' '}
-                  <strong className={styles.strongText}>Delivr-X</strong> dispatches drone fleets
-                  across dense urban airspace.{' '}
-                  <strong className={styles.strongText}>DeepShield</strong> checks uploaded videos for
-                  deepfakes.{' '}
-                  <strong className={styles.strongText}>Mirror Memory</strong> is an ESP32 RFID asset
-                  reader I built on real hardware.
+                  I build things end to end. I started with C and C++, then learned HTML, CSS and
+                  JavaScript, and moved on to the MERN stack and beyond. Now I work across
+                  full-stack, backend and AI/ML projects like Day 0, Delivr-X and DeepShield. I also
+                  build hardware, like an ESP32 RFID reader, and ocean data pipelines for ORCA.
                 </p>
               </div>
 
               {/* 3. How I think */}
               <div>
                 <div className={styles.sectionLabel}>How I think</div>
-                <p className={styles.sectionText}>[REPLACE WITH MY OWN SHORT LINE]</p>
+                <p className={styles.sectionText}>
+                  I learn by building. Every project on my GitHub is numbered because each one was
+                  the next step up from the last. I&apos;d rather ship something rough and fix it
+                  than wait until I understand everything. These days I build with AI as a teammate,
+                  not a shortcut.
+                </p>
+              </div>
+
+              {/* 4. Outside work */}
+              <div>
+                <div className={styles.sectionLabel}>Outside work</div>
+                <p className={styles.sectionText}>
+                  I&apos;m most at home in a hackathon, where a team, a deadline and a half-formed
+                  idea turn into a working product overnight. I enter them often, and it&apos;s
+                  where I learn fastest. Away from the screen, I play cricket and volleyball, and
+                  BGMI when I want to switch off. I cook, I travel whenever I get the chance, and
+                  music is how I unwind once the code is done.
+                </p>
               </div>
             </div>
           </div>
@@ -271,14 +306,25 @@ export default function AboutMe() {
           {/* Top Row: Avatar + Name + LinkedIn Badge */}
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-3">
-              <div className={styles.avatarCircle} aria-hidden="true">
-                AV
+              <div className={styles.avatarCircle}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/vinit-avatar.jpg"
+                  alt="Vinit Singh"
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                    objectPosition: 'center 20%',
+                    display: 'block',
+                  }}
+                />
               </div>
               <div>
                 <div className="font-bold text-base text-zinc-100 dark:text-white leading-tight">
-                  AxeVin
+                  Vinit Singh
                 </div>
-                <div className="text-xs text-zinc-400 font-mono">@{GITHUB_USERNAME}</div>
+                <div className="text-xs text-zinc-400 font-mono">@vinitsi-2043-</div>
               </div>
             </div>
 
@@ -327,9 +373,8 @@ export default function AboutMe() {
 
           {/* Tonearm */}
           <div
-            className={`${styles.tonearm} ${
-              isPlaying && !reducedMotion ? styles.tonearmPlaying : styles.tonearmStopped
-            }`}
+            className={`${styles.tonearm} ${isPlaying && !reducedMotion ? styles.tonearmPlaying : styles.tonearmStopped
+              }`}
             aria-hidden="true"
           >
             <svg width="32" height="72" viewBox="0 0 32 72" fill="none">
@@ -364,81 +409,65 @@ export default function AboutMe() {
         </div>
 
         {/* ══════════════════════════════════════════
-            CARD 4: BOOKS HOBBY (Column 2, row 2)
+            CARD 4: FOOD PHOTOS — full bleed slideshow
            ══════════════════════════════════════════ */}
-        <div className={`${styles.cardBase} ${styles.cardBooks}`} aria-label="Reading hobby">
-          {/* Label */}
-          <div className={styles.booksLabel}>Currently reading</div>
-
-          {/* Book cover slides */}
-          <div className={styles.booksCoverArea} aria-hidden="true">
-            {BOOKS.map((book, idx) => (
-              <div
-                key={book.title}
-                className={styles.bookCoverWrapper}
-                style={{ opacity: idx === bookIndex ? 1 : 0 }}
-              >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={book.cover}
-                  alt={book.title}
-                  className={styles.bookCoverImg}
-                  loading={idx === 0 ? 'eager' : 'lazy'}
-                />
-                {/* Soft shadow under book */}
-                <div className={styles.bookShadow} aria-hidden="true" />
-              </div>
-            ))}
-          </div>
-
-          {/* Book info */}
-          <div className={styles.booksInfo}>
-            <div className={styles.booksTitle}>{BOOKS[bookIndex].title}</div>
-            <div className={styles.booksAuthor}>{BOOKS[bookIndex].author}</div>
-          </div>
-
-          {/* Dot indicators */}
-          <div className={styles.booksDots} aria-hidden="true">
-            {BOOKS.map((_, i) => (
-              <span
-                key={i}
-                className={styles.booksDot}
-                style={{
-                  opacity: i === bookIndex ? 1 : 0.28,
-                  transform: i === bookIndex ? 'scale(1.3)' : 'scale(1)',
-                }}
+        <div className={`${styles.cardBase} ${styles.cardPhotos}`} aria-label="Food hobby">
+          {FOOD_IMAGES.map((src, idx) => (
+            <div
+              key={src}
+              className={styles.photoSlide}
+              style={{ opacity: idx === photoIndex ? 1 : 0 }}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={src}
+                alt={`Food photo ${idx + 1}`}
+                style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', borderRadius: 'inherit' }}
+                loading="eager"
               />
-            ))}
-          </div>
+            </div>
+          ))}
         </div>
 
         {/* ══════════════════════════════════════════
-            CARD 5: BLOG (Column 3, row 2)
+            CARD 5: LATEST BUILD (Column 3, row 2)
            ══════════════════════════════════════════ */}
         <div className={`${styles.cardBase} ${styles.cardBlog}`}>
-          {/* Crescent Moon Icon */}
-          <div aria-hidden="true">
-            <CrescentMoonIcon />
+          {/* Tag pill */}
+          <div
+            style={{
+              display: 'inline-block',
+              fontSize: '11px',
+              fontWeight: 700,
+              textTransform: 'uppercase',
+              letterSpacing: '0.1em',
+              color: '#FF6A1A',
+              background: 'rgba(255,106,26,0.1)',
+              border: '1px solid rgba(255,106,26,0.25)',
+              borderRadius: '9999px',
+              padding: '3px 10px',
+            }}
+          >
+            {LATEST_BUILD.tag}
           </div>
 
-          {/* Latest build link */}
+          {/* Title link */}
           <a
-            href={BLOG_URL}
+            href={LATEST_BUILD.url}
             target="_blank"
             rel="noopener noreferrer"
             suppressHydrationWarning
             className={`${styles.blogLink} ${styles.focusOrange}`}
           >
-            <span>Latest build</span>
+            <span>{LATEST_BUILD.title}</span>
             <ArrowRightIcon />
           </a>
 
-          {/* Short note */}
+          {/* Description */}
           <p className={styles.blogNote}>
-            A short note on what you are building right now and what you learned from it.
+            {LATEST_BUILD.description}
           </p>
         </div>
-
         {/* ══════════════════════════════════════════
             CARD 6: GITHUB CONTRIBUTIONS (Cols 2-3, row 3)
            ══════════════════════════════════════════ */}
@@ -451,7 +480,7 @@ export default function AboutMe() {
                   {contributionsCount.toLocaleString()}
                 </span>
               )}
-              <span>contributions in the last year</span>
+              <span>contributions this year</span>
             </div>
 
             <a

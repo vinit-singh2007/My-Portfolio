@@ -3,11 +3,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { Menu, X, ArrowUp, ArrowDown, ArrowRight, ExternalLink } from 'lucide-react';
-import Image from 'next/image';
 import ThreeBackground from './ThreeBackground';
 import TextRollLink from './TextRollLink';
 import SocialRail from './SocialRail';
 import { playNavHoverSound, playNavClickSound } from '@/lib/navSound';
+import { onOpeningReveal } from '@/lib/openingState';
 
 const NAV_LINKS = [
   { key: 'about', label: 'What I Am About', targetId: 'about' },
@@ -18,9 +18,11 @@ const NAV_LINKS = [
   { key: 'contact', label: 'Contact', targetId: 'contact' },
 ];
 
+const FULL_HEADLINE = "YO I'M VINIT";
+const FULL_SUBTITLE = 'Full Stack Engineer & AI Systems Developer';
 const FULL_TEXT =
-  'Tailored engineering solutions in high-performance web applications, scalable distributed backend architecture, and intelligent machine learning models.';
-const ORANGE_WORD = 'Tailored';
+  'Architecting end-to-end web platforms, resilient backends and intelligent ML-driven applications, engineered from low-level C and C++ fundamentals up to the modern MERN stack.';
+const ORANGE_WORD = 'Architecting';
 const TYPING_SPEED_MS = 18;
 const TYPING_START_DELAY_MS = 500;
 
@@ -75,8 +77,12 @@ export default function Hero() {
     };
   }, [mobileMenuOpen]);
 
-  /* ── Typewriter ── */
+  /* ── Typewriter state for all 3 hero texts ── */
   const shouldReduceMotion = useReducedMotion();
+  const [displayedHeadline, setDisplayedHeadline] = useState('');
+  const [headlineDone, setHeadlineDone] = useState(false);
+  const [displayedSubtitle, setDisplayedSubtitle] = useState('');
+  const [subtitleDone, setSubtitleDone] = useState(false);
   const [displayedText, setDisplayedText] = useState('');
   const [typingDone, setTypingDone] = useState(false);
 
@@ -84,26 +90,75 @@ export default function Hero() {
     setMounted(true);
   }, []);
 
-  /* ── Typewriter effect ── */
+  /* ── Simultaneous Typewriter effect ── */
   useEffect(() => {
     if (shouldReduceMotion) {
+      setDisplayedHeadline(FULL_HEADLINE);
+      setHeadlineDone(true);
+      setDisplayedSubtitle(FULL_SUBTITLE);
+      setSubtitleDone(true);
       setDisplayedText(FULL_TEXT);
       setTypingDone(true);
       return;
     }
-    let i = 0;
-    const startTimer = setTimeout(() => {
-      const interval = setInterval(() => {
-        i++;
-        setDisplayedText(FULL_TEXT.slice(0, i));
-        if (i >= FULL_TEXT.length) {
-          clearInterval(interval);
+
+    let hInterval: NodeJS.Timeout | null = null;
+    let sInterval: NodeJS.Timeout | null = null;
+    let bInterval: NodeJS.Timeout | null = null;
+    let started = false;
+
+    const startTyping = () => {
+      if (started) return;
+      started = true;
+
+      // 1. Headline ("YO I'M VINIT") — deliberate, readable cinematic pace
+      let hIdx = 0;
+      hInterval = setInterval(() => {
+        hIdx++;
+        setDisplayedHeadline(FULL_HEADLINE.slice(0, hIdx));
+        if (hIdx >= FULL_HEADLINE.length) {
+          if (hInterval) clearInterval(hInterval);
+          setHeadlineDone(true);
+        }
+      }, 115);
+
+      // 2. Subtitle ("Full Stack Engineer & AI Systems Developer")
+      let sIdx = 0;
+      sInterval = setInterval(() => {
+        sIdx++;
+        setDisplayedSubtitle(FULL_SUBTITLE.slice(0, sIdx));
+        if (sIdx >= FULL_SUBTITLE.length) {
+          if (sInterval) clearInterval(sInterval);
+          setSubtitleDone(true);
+        }
+      }, 36);
+
+      // 3. Body text ("Tailored engineering solutions...")
+      let bIdx = 0;
+      bInterval = setInterval(() => {
+        bIdx++;
+        setDisplayedText(FULL_TEXT.slice(0, bIdx));
+        if (bIdx >= FULL_TEXT.length) {
+          if (bInterval) clearInterval(bInterval);
           setTypingDone(true);
         }
       }, TYPING_SPEED_MS);
-      return () => clearInterval(interval);
-    }, TYPING_START_DELAY_MS);
-    return () => clearTimeout(startTimer);
+    };
+
+    let initialTimer: NodeJS.Timeout | null = null;
+
+    // Start typing right as the sliding panels clear the text column
+    const unsubscribeReveal = onOpeningReveal(() => {
+      initialTimer = setTimeout(startTyping, 420);
+    });
+
+    return () => {
+      unsubscribeReveal();
+      if (initialTimer) clearTimeout(initialTimer);
+      if (hInterval) clearInterval(hInterval);
+      if (sInterval) clearInterval(sInterval);
+      if (bInterval) clearInterval(bInterval);
+    };
   }, [shouldReduceMotion]);
 
   useEffect(() => {
@@ -179,55 +234,21 @@ export default function Hero() {
       </div>
 
       {/* ── Top Header Navigation Bar ── */}
-      <header className="relative z-30 w-full px-6 sm:px-12 lg:px-20 pt-8 sm:pt-10 flex items-center justify-between">
-        {/* Brand */}
-        <button
-          suppressHydrationWarning
-          onClick={() => scrollTo('hero')}
-          className="flex items-center gap-2.5 py-0.5 rounded-lg group cursor-pointer focus:outline-none"
-          aria-label="Scroll to top"
-        >
-          <div className="relative w-8 h-8 sm:w-9 sm:h-9 rounded-lg overflow-hidden border border-white/15 flex items-center justify-center bg-[#0E0E0E] shadow-sm group-hover:border-[#FF6A1A]/40 group-hover:shadow-[0_0_12px_rgba(255,106,26,0.2)] transition-all duration-300">
-            <Image
-              src="/logo.png"
-              alt="AxeVin Logo"
-              width={36}
-              height={36}
-              priority
-              className="w-full h-full object-cover"
+      <header className="relative z-30 w-full px-6 sm:px-12 lg:px-20 pt-8 sm:pt-10 flex items-center justify-center">
+        {/* Centered Navigation Links with Text Roll Hover Animation */}
+        <nav ref={navRef} className="hidden md:flex items-center justify-center gap-10 lg:gap-12">
+          {NAV_LINKS.map((link) => (
+            <TextRollLink
+              key={link.key}
+              label={link.label}
+              isActive={activeKey === link.key}
+              onClick={() => scrollTo(link.targetId, link.key)}
             />
-          </div>
-          <span className="text-lg font-bold tracking-tight text-white group-hover:text-zinc-200 transition-colors">
-            AxeVin
-          </span>
-        </button>
-
-        {/* Centered / Right Navigation Links with Text Roll Hover Animation */}
-        <nav ref={navRef} className="hidden md:flex items-center gap-10 lg:gap-12">
-          {NAV_LINKS.map((link) =>
-            link.key === 'contact' ? (
-              <button
-                key={link.key}
-                type="button"
-                suppressHydrationWarning
-                onClick={() => scrollTo(link.targetId, link.key)}
-                className="text-xs uppercase tracking-[0.2em] font-medium cursor-pointer focus:outline-none text-[#FF6A1A] hover:text-[#e55a10] transition-colors"
-              >
-                {link.label}
-              </button>
-            ) : (
-              <TextRollLink
-                key={link.key}
-                label={link.label}
-                isActive={activeKey === link.key}
-                onClick={() => scrollTo(link.targetId, link.key)}
-              />
-            )
-          )}
+          ))}
         </nav>
 
         {/* Mobile Menu Trigger */}
-        <div className="flex items-center md:hidden">
+        <div className="flex items-center md:hidden absolute right-6 sm:right-12 top-8 sm:top-10">
           <button
             suppressHydrationWarning
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -251,21 +272,27 @@ export default function Hero() {
             className="md:hidden absolute top-24 inset-x-6 z-50 p-6 rounded-2xl bg-[#111111]/95 border border-white/10 backdrop-blur-xl shadow-2xl flex flex-col gap-4 text-center"
           >
             <button onClick={() => scrollTo('about')} className="py-2 text-xs font-semibold tracking-[0.2em] uppercase text-zinc-300 hover:text-white">
+              suppressHydrationWarning
               WHAT I AM ABOUT
             </button>
             <button onClick={() => scrollTo('projects')} className="py-2 text-xs font-semibold tracking-[0.2em] uppercase text-zinc-300 hover:text-white">
+              suppressHydrationWarning
               WHAT I DO
             </button>
             <button onClick={() => scrollTo('experience')} className="py-2 text-xs font-semibold tracking-[0.2em] uppercase text-zinc-300 hover:text-white">
+              suppressHydrationWarning
               MY EXPERIENCE
             </button>
             <button onClick={() => scrollTo('skills')} className="py-2 text-xs font-semibold tracking-[0.2em] uppercase text-zinc-300 hover:text-white">
+              suppressHydrationWarning
               EXPERTISE
             </button>
             <button onClick={() => scrollTo('blog')} className="py-2 text-xs font-semibold tracking-[0.2em] uppercase text-zinc-300 hover:text-white">
+              suppressHydrationWarning
               BLOG
             </button>
-            <button onClick={() => scrollTo('contact')} className="py-2 text-xs font-semibold tracking-[0.2em] uppercase text-[#FF6A1A] hover:text-[#e55a10] transition-colors">
+            <button onClick={() => scrollTo('contact')} className="py-2 text-xs font-semibold tracking-[0.2em] uppercase text-zinc-300 hover:text-white">
+              suppressHydrationWarning
               CONTACT
             </button>
           </motion.div>
@@ -275,25 +302,31 @@ export default function Hero() {
       {/* ── Main Landing Content (Exact Layout from Video Reference) ── */}
       <div className="relative z-10 w-full max-w-7xl mx-auto px-6 sm:px-12 lg:px-20 py-16 sm:py-24 flex-1 flex flex-col justify-center">
         <div className="max-w-2xl space-y-6">
-          {/* Prominent Clean Headline (Matching Video Headline) */}
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.1 }}
-            className="text-4xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-white leading-[1.08]"
+          {/* Prominent Clean Headline (Live simultaneous typewriter) */}
+          <h1
+            className="text-4xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-white leading-[1.08] min-h-[1.1em]"
           >
-            YO I'M VINIT
-          </motion.h1>
+            {displayedHeadline}
+            {!headlineDone && (
+              <span
+                className="inline-block w-[3px] sm:w-[5px] h-[0.85em] bg-[#FF6A1A] ml-1.5 animate-pulse align-middle"
+                aria-hidden="true"
+              />
+            )}
+          </h1>
 
-          {/* Subtitle & Role */}
-          <motion.h2
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.15 }}
-            className="text-xl sm:text-2xl font-light text-zinc-300 tracking-wide"
+          {/* Subtitle & Role (Live simultaneous typewriter) */}
+          <h2
+            className="text-xl sm:text-2xl font-light text-zinc-300 tracking-wide min-h-[1.3em]"
           >
-            Full Stack Engineer & AI Systems Developer
-          </motion.h2>
+            {displayedSubtitle}
+            {!subtitleDone && (
+              <span
+                className="inline-block w-[2px] h-[0.85em] bg-zinc-300 ml-1 animate-pulse align-middle"
+                aria-hidden="true"
+              />
+            )}
+          </h2>
 
           {/* Tailored Solutions Description — typewriter */}
           <p className="text-sm sm:text-base text-zinc-400 font-light leading-relaxed max-w-xl min-h-[4em]">

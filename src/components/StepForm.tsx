@@ -276,6 +276,7 @@ export default function StepForm({
 
         <button
           type="button"
+          suppressHydrationWarning
           onClick={handleReset}
           className="px-6 py-2.5 rounded-full border border-white/20 text-xs font-semibold uppercase tracking-wider text-zinc-300 hover:text-white hover:border-[#f97316] transition-colors cursor-pointer"
         >
@@ -450,6 +451,7 @@ export default function StepForm({
                         <button
                           key={chip}
                           type="button"
+                          suppressHydrationWarning
                           onClick={() => handleChipSelect(chip)}
                           className={`px-4 py-2 rounded-full border text-[13px] font-medium transition-all duration-200 cursor-pointer ${
                             isSelected
@@ -577,6 +579,7 @@ export default function StepForm({
       <div className="flex items-center justify-between pt-4 border-t border-white/[0.06]">
         <button
           type="button"
+          suppressHydrationWarning
           disabled={step === 1 || isSubmitting}
           onClick={handleBack}
           className="px-5 py-2.5 rounded-full border border-white/20 text-xs font-semibold uppercase tracking-wider text-zinc-300 hover:text-white hover:border-white/40 disabled:opacity-30 disabled:pointer-events-none transition-all cursor-pointer"
@@ -587,6 +590,7 @@ export default function StepForm({
         {step < 4 ? (
           <button
             type="button"
+            suppressHydrationWarning
             onClick={handleNext}
             className="px-6 py-2.5 rounded-full bg-white text-black text-xs font-bold uppercase tracking-wider hover:bg-zinc-200 transition-all cursor-pointer shadow-md"
           >
@@ -595,6 +599,7 @@ export default function StepForm({
         ) : (
           <button
             type="submit"
+            suppressHydrationWarning
             disabled={isSubmitting}
             className="px-7 py-2.5 rounded-full bg-[#f97316] text-black text-xs font-bold uppercase tracking-wider hover:bg-[#e55a10] disabled:bg-zinc-800 disabled:text-zinc-500 transition-all cursor-pointer shadow-md shadow-[#f97316]/25 flex items-center gap-2 overflow-hidden relative"
           >

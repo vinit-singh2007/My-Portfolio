@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef } from 'react';
+import { onOpeningReveal } from '@/lib/openingState';
 
 export default function ThreeBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -21,9 +22,14 @@ export default function ThreeBackground() {
     let smoothScrollY = scrollY;
     let isAnimating = true;
 
-    // Intro open animation tracking (runs for ~2.2s on open, then settles)
-    const introStartTime = performance.now();
-    const introDuration = 2200; // ms
+    // Intro open animation tracking (runs for ~2.6s right as opening reveals)
+    let introStartTime = performance.now();
+    const introDuration = 2600; // ms
+
+    const unsubscribeReveal = onOpeningReveal(() => {
+      introStartTime = performance.now();
+      wakeUp();
+    });
 
     const handleResize = () => {
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -99,10 +105,13 @@ export default function ThreeBackground() {
         const openingWaveOffset =
           introFlourish * Math.sin(t * Math.PI * 2.5 + introT * 3.5) * (height * 0.18);
 
+        // Gentle continuous ambient breathing wave so the background never feels frozen
+        const ambientFloat = Math.sin((now * 0.0008) + t * Math.PI * 1.3) * 12;
+
         const scrollFlex =
           (scrollElevationShift / (height || 1)) * 40 * Math.sin(t * Math.PI);
 
-        const y = height * 0.98 - baseWave - openingWaveOffset + scrollFlex;
+        const y = height * 0.98 - baseWave - openingWaveOffset + scrollFlex + ambientFloat;
         const x = baseX;
 
         // Expanded ribbon width: spans a much broader, sculptural area across canvas
@@ -170,13 +179,6 @@ export default function ThreeBackground() {
         }
       }
 
-      // If intro has settled and user is not scrolling, pause RAF loop to remain 100% stable
-      if (!isIntroActive && !isScrolling) {
-        smoothScrollY = scrollY;
-        isAnimating = false;
-        return;
-      }
-
       animationFrameId = requestAnimationFrame(render);
     };
 
@@ -184,6 +186,7 @@ export default function ThreeBackground() {
     animationFrameId = requestAnimationFrame(render);
 
     return () => {
+      unsubscribeReveal();
       window.removeEventListener('resize', handleResize);
       window.removeEventListener('scroll', handleScroll);
       cancelAnimationFrame(animationFrameId);

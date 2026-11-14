@@ -173,6 +173,7 @@ export default function ContactInfo() {
             {/* Copy Button */}
             <button
               type="button"
+              suppressHydrationWarning
               onClick={handleCopyEmail}
               aria-label="Copy email address"
               className={`ml-auto flex-shrink-0 self-center text-xs font-medium px-[13px] py-[5px] rounded-full transition-all duration-200 relative z-10 select-none ${
