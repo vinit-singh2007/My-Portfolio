@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
-import { Inter, JetBrains_Mono } from "next/font/google";
+import { Inter, JetBrains_Mono, Dancing_Script } from "next/font/google";
 import "./globals.css";
-import { ThemeProvider } from "@/components/ThemeProvider";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -12,6 +11,13 @@ const inter = Inter({
 const jetbrainsMono = JetBrains_Mono({
   variable: "--font-mono",
   subsets: ["latin"],
+  display: "swap",
+});
+
+const dancingScript = Dancing_Script({
+  variable: "--font-script",
+  subsets: ["latin"],
+  weight: "700",
   display: "swap",
 });
 
@@ -28,8 +34,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "AveVin",
+    title: "AxeVin",
     description: "Portfolio of Vinit Singh — building high-performance web applications and interactive 3D digital experiences.",
+    creator: "@AxeVinSi",
   },
 };
 
@@ -41,12 +48,10 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${jetbrainsMono.variable} h-full antialiased dark`}
+      className={`${inter.variable} ${jetbrainsMono.variable} ${dancingScript.variable} h-full antialiased dark`}
     >
-      <body className="min-h-full flex flex-col bg-[#fafafa] text-[#09090b] dark:bg-[#030712] dark:text-[#f4f4f5] transition-colors duration-500 font-[var(--font-inter)]">
-        <ThemeProvider>
-          {children}
-        </ThemeProvider>
+      <body className="min-h-full flex flex-col bg-[#0A0A0A] text-[#EDEDED] antialiased font-[var(--font-inter)] selection:bg-white/20 selection:text-white">
+        {children}
       </body>
     </html>
   );

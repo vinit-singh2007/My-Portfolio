@@ -1,67 +1,72 @@
 'use client';
 
-import React from 'react';
-import { motion } from 'framer-motion';
-import { ArrowRight } from 'lucide-react';
-import ThreeBackground from './ThreeBackground';
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Menu, X, ArrowUp, ArrowDown, ArrowRight, ExternalLink } from 'lucide-react';
 import Image from 'next/image';
-import { useTheme } from './ThemeProvider';
+import ThreeBackground from './ThreeBackground';
+import TextRollLink from './TextRollLink';
+import HeroSocials from './HeroSocials';
 
-function GithubIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="20"
-      height="20"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={className}
-    >
-      <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4" />
-      <path d="M9 18c-4.51 2-5-2-7-2" />
-    </svg>
-  );
-}
-
-function LinkedinIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="20"
-      height="20"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={className}
-    >
-      <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
-      <rect width="4" height="12" x="2" y="9" />
-      <circle cx="4" cy="4" r="2" />
-    </svg>
-  );
-}
+const NAV_LINKS = [
+  { key: 'about', label: 'About Me', targetId: 'skills' },
+  { key: 'what-i-do', label: 'What I Do', targetId: 'projects' },
+  { key: 'experience', label: 'My Experience', targetId: 'experience' },
+  { key: 'work', label: 'My Work', targetId: 'projects' },
+  { key: 'blog', label: 'Blog', targetId: 'blog' },
+  { key: 'contact', label: 'Contact', targetId: 'contact' },
+];
 
 export default function Hero() {
-  const { theme } = useTheme();
-  const [mounted, setMounted] = React.useState(false);
+  const [mounted, setMounted] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [activeKey, setActiveKey] = useState('');
 
-  React.useEffect(() => {
+  useEffect(() => {
     setMounted(true);
   }, []);
 
-  const currentTheme = mounted ? theme : 'dark';
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollPosition = window.scrollY + 160;
 
-  const scrollTo = (id: string) => {
+      const contactEl = document.getElementById('contact');
+      const blogEl = document.getElementById('blog');
+      const experienceEl = document.getElementById('experience');
+      const skillsEl = document.getElementById('skills');
+      const projectsEl = document.getElementById('projects');
+
+      if (contactEl && scrollPosition >= contactEl.offsetTop) {
+        setActiveKey('contact');
+      } else if (blogEl && scrollPosition >= blogEl.offsetTop) {
+        setActiveKey('blog');
+      } else if (experienceEl && scrollPosition >= experienceEl.offsetTop) {
+        setActiveKey('experience');
+      } else if (skillsEl && scrollPosition >= skillsEl.offsetTop) {
+        setActiveKey('about');
+      } else if (projectsEl && scrollPosition >= projectsEl.offsetTop) {
+        const halfProjects = projectsEl.offsetTop + projectsEl.offsetHeight * 0.45;
+        if (scrollPosition < halfProjects) {
+          setActiveKey('what-i-do');
+        } else {
+          setActiveKey('work');
+        }
+      } else {
+        setActiveKey('');
+      }
+    };
+
+    handleScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const scrollTo = (id: string, key?: string) => {
+    if (key) setActiveKey(key);
+    setMobileMenuOpen(false);
     const element = document.getElementById(id);
     if (element) {
-      const offsetTop = element.offsetTop - 80;
+      const offsetTop = id === 'hero' || id === 'projects' ? element.offsetTop : element.offsetTop - 70;
       window.scrollTo({
         top: offsetTop >= 0 ? offsetTop : 0,
         behavior: 'smooth',
@@ -72,207 +77,204 @@ export default function Hero() {
   return (
     <section
       id="hero"
-      className="min-h-screen flex items-center justify-center relative px-6 pt-24 overflow-hidden"
+      className="relative w-full h-full min-h-screen flex flex-col justify-between overflow-hidden select-none bg-[#0A0A0A] text-white"
     >
-      {/* Background Elements Container with smooth bottom fade-out mask */}
-      <div
-        className="absolute inset-0 pointer-events-none z-0"
-        style={{
-          maskImage: 'linear-gradient(to bottom, white calc(100% - 160px), transparent 100%)',
-          WebkitMaskImage: 'linear-gradient(to bottom, white calc(100% - 160px), transparent 100%)',
-        }}
-      >
-        {/* 3D Particle Background */}
+      {/* ── Background: 3D Sculptural Ribbed Ribbon Canvas + Clean Dark Space ── */}
+      <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
+        {/* Real-time 3D Sculptural Ribbed Ribbon */}
         <ThreeBackground />
 
-        {/* Grid Pattern Overlay */}
-        <div
-          className="absolute inset-0 bg-[size:28px_28px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_40%,#000_70%,transparent_100%)]"
-          style={{
-            backgroundImage: currentTheme === 'dark'
-              ? 'linear-gradient(to right, rgba(99, 102, 241, 0.03) 1px, transparent 1px), linear-gradient(to bottom, rgba(99, 102, 241, 0.03) 1px, transparent 1px)'
-              : 'linear-gradient(to right, rgba(99, 102, 241, 0.04) 1px, transparent 1px), linear-gradient(to bottom, rgba(99, 102, 241, 0.04) 1px, transparent 1px)',
-            transition: 'background-image 0.5s ease',
-          }}
-        />
+        {/* Subtle radial shading into #0A0A0A */}
+        <div className="absolute inset-0 bg-radial-gradient from-transparent via-[#0A0A0A]/40 to-[#0A0A0A] pointer-events-none" />
 
-        {/* Decorative Glow Spheres */}
-        <div className="absolute bottom-1/4 right-1/4 translate-x-1/2 translate-y-1/2 w-[400px] h-[400px] bg-cyan-500/10 dark:bg-cyan-500/15 rounded-full blur-[120px]" />
+        {/* Seamless bottom fade mask */}
+        <div className="absolute bottom-0 inset-x-0 h-32 bg-gradient-to-t from-[#0A0A0A] to-transparent pointer-events-none" />
       </div>
 
-      <div className="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-12 items-center z-10 py-12">
-        {/* Left column (Content) */}
-        <div className="lg:col-span-8 space-y-6 text-left flex flex-col justify-center">
-          {/* Social Icons */}
-          <motion.div
-            variants={{
-              hidden: { opacity: 0, y: 15 },
-              visible: { opacity: 1, y: 0 },
-            }}
-            initial="hidden"
-            animate="visible"
-            transition={{ duration: 0.6 }}
-            className="flex items-center gap-4 text-zinc-500 dark:text-zinc-400"
-          >
-            <a
-              href="https://github.com/vinit-singh2007"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-indigo-600 dark:hover:text-cyan-400 transition-colors"
-              title="GitHub"
-            >
-              <GithubIcon className="w-5.5 h-5.5" />
-            </a>
-            <a
-              href="https://linkedin.com/in/vinitsi-2043-"
-              className="hover:text-indigo-600 dark:hover:text-cyan-400 transition-colors"
-              title="LinkedIn"
-            >
-              <LinkedinIcon className="w-5.5 h-5.5" />
-            </a>
-          </motion.div>
+      {/* ── Top Header Navigation Bar ── */}
+      <header className="relative z-30 w-full px-6 sm:px-12 lg:px-20 pt-8 sm:pt-10 flex items-center justify-between">
+        {/* Brand */}
+        <button
+          suppressHydrationWarning
+          onClick={() => scrollTo('hero')}
+          className="flex items-center gap-2.5 py-0.5 rounded-lg group cursor-pointer focus:outline-none"
+          aria-label="Scroll to top"
+        >
+          <div className="relative w-8 h-8 sm:w-9 sm:h-9 rounded-lg overflow-hidden border border-white/15 flex items-center justify-center bg-[#0E0E0E] shadow-sm group-hover:border-[#FF6A1A]/40 group-hover:shadow-[0_0_12px_rgba(255,106,26,0.2)] transition-all duration-300">
+            <Image
+              src="/logo.png"
+              alt="AxeVin Logo"
+              width={36}
+              height={36}
+              priority
+              className="w-full h-full object-cover"
+            />
+          </div>
+          <span className="text-lg font-bold tracking-tight text-white group-hover:text-zinc-200 transition-colors">
+            AxeVin
+          </span>
+        </button>
 
-          {/* Heading */}
-          <motion.h1
-            variants={{
-              hidden: { opacity: 0, y: 25 },
-              visible: { opacity: 1, y: 0 },
-            }}
-            initial="hidden"
-            animate="visible"
-            transition={{ duration: 0.8, delay: 0.1, ease: [0.16, 1, 0.3, 1] as const }}
-            className="text-4xl md:text-7xl font-extrabold tracking-tight leading-[1.15] text-zinc-900 dark:text-white"
+        {/* Centered / Right Navigation Links with Text Roll Hover Animation */}
+        <nav className="hidden md:flex items-center gap-10 lg:gap-12">
+          {NAV_LINKS.map((link) =>
+            link.key === 'contact' ? (
+              <button
+                key={link.key}
+                type="button"
+                suppressHydrationWarning
+                onClick={() => scrollTo(link.targetId, link.key)}
+                className="text-xs uppercase tracking-[0.2em] font-medium cursor-pointer focus:outline-none text-[#FF6A1A] hover:text-[#e55a10] transition-colors"
+              >
+                {link.label}
+              </button>
+            ) : (
+              <TextRollLink
+                key={link.key}
+                label={link.label}
+                isActive={activeKey === link.key}
+                onClick={() => scrollTo(link.targetId, link.key)}
+              />
+            )
+          )}
+        </nav>
+
+        {/* Mobile Menu Trigger */}
+        <div className="flex items-center md:hidden">
+          <button
+            suppressHydrationWarning
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="p-2 rounded-full border border-white/[0.08] bg-white/[0.04] text-zinc-300 hover:text-white cursor-pointer"
+            aria-label="Toggle menu"
           >
-             VINIT SINGH<span className="text-indigo-500 dark:text-cyan-400">.</span>
+            {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          </button>
+        </div>
+      </header>
+
+      {/* Mobile Menu Dropdown */}
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -16 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -16 }}
+            transition={{ duration: 0.2 }}
+            className="md:hidden absolute top-24 inset-x-6 z-50 p-6 rounded-2xl bg-[#111111]/95 border border-white/10 backdrop-blur-xl shadow-2xl flex flex-col gap-4 text-center"
+          >
+            <button onClick={() => scrollTo('skills')} className="py-2 text-xs font-semibold tracking-[0.2em] uppercase text-zinc-300 hover:text-white">
+              ABOUT ME
+            </button>
+            <button onClick={() => scrollTo('projects')} className="py-2 text-xs font-semibold tracking-[0.2em] uppercase text-zinc-300 hover:text-white">
+              WHAT I DO
+            </button>
+            <button onClick={() => scrollTo('experience')} className="py-2 text-xs font-semibold tracking-[0.2em] uppercase text-zinc-300 hover:text-white">
+              MY EXPERIENCE
+            </button>
+            <button onClick={() => scrollTo('projects')} className="py-2 text-xs font-semibold tracking-[0.2em] uppercase text-zinc-300 hover:text-white">
+              MY WORK
+            </button>
+            <button onClick={() => scrollTo('blog')} className="py-2 text-xs font-semibold tracking-[0.2em] uppercase text-zinc-300 hover:text-white">
+              BLOG
+            </button>
+            <button onClick={() => scrollTo('contact')} className="py-2 text-xs font-semibold tracking-[0.2em] uppercase text-[#FF6A1A] hover:text-[#e55a10] transition-colors">
+              CONTACT
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* ── Main Landing Content (Exact Layout from Video Reference) ── */}
+      <div className="relative z-10 w-full max-w-7xl mx-auto px-6 sm:px-12 lg:px-20 py-16 sm:py-24 flex-1 flex flex-col justify-center">
+        <div className="max-w-2xl space-y-6">
+          {/* Prominent Clean Headline (Matching Video Headline) */}
+          <motion.h1
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.1 }}
+            className="text-4xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-white leading-[1.08]"
+          >
+            Vinit Singh
           </motion.h1>
 
-          {/* Subtitle */}
+          {/* Subtitle & Role */}
           <motion.h2
-            variants={{
-              hidden: { opacity: 0, y: 20 },
-              visible: { opacity: 1, y: 0 },
-            }}
-            initial="hidden"
-            animate="visible"
-            transition={{ duration: 0.8, delay: 0.15, ease: [0.16, 1, 0.3, 1] as const }}
-            className="text-2xl md:text-4xl font-bold text-zinc-500 dark:text-zinc-400"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.15 }}
+            className="text-xl sm:text-2xl font-light text-zinc-300 tracking-wide"
           >
-            I&apos;m a{' '}
-            <span className="text-indigo-600 dark:text-cyan-400 font-extrabold">
-              Software Engineer
-            </span>
-
+            Full Stack Engineer & AI Systems Developer
           </motion.h2>
 
-          {/* Bio Description */}
+          {/* Tailored Solutions Description (Matching Video Content Structure) */}
           <motion.p
-            variants={{
-              hidden: { opacity: 0, y: 20 },
-              visible: { opacity: 1, y: 0 },
-            }}
-            initial="hidden"
-            animate="visible"
-            transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] as const }}
-            className="text-base md:text-lg text-zinc-600 dark:text-zinc-400 max-w-xl leading-relaxed font-light"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className="text-sm sm:text-base text-zinc-400 font-light leading-relaxed max-w-xl"
           >
-            Heavy on the backend, obsessed with AI/ML, and capable enough in frontend to make sure my models don&apos;t look like an Excel sheet.
+            Tailored engineering solutions in high-performance web applications, scalable distributed backend architecture, and intelligent machine learning models.
           </motion.p>
 
-          {/* Buttons */}
+          {/* Action Link: Learn More (Matching Video Reference) */}
           <motion.div
-            variants={{
-              hidden: { opacity: 0, y: 20 },
-              visible: { opacity: 1, y: 0 },
-            }}
-            initial="hidden"
-            animate="visible"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.25 }}
-            className="flex flex-col sm:flex-row items-center gap-4 pt-4"
+            className="pt-2"
           >
-            <button
-              suppressHydrationWarning
-              onClick={() => scrollTo('contact')}
-              className="px-6 py-3.5 rounded-xl font-bold text-xs tracking-wider uppercase bg-indigo-600 text-white dark:bg-cyan-400 dark:text-zinc-950 hover:bg-indigo-700 dark:hover:bg-cyan-300 transition-colors shadow-lg shadow-indigo-500/10 cursor-pointer flex items-center justify-center gap-2 group w-full sm:w-auto"
-            >
-              <span>GET IN TOUCH</span>
-              <ArrowRight className="w-4.5 h-4.5 group-hover:translate-x-1 transition-transform" />
-            </button>
             <button
               suppressHydrationWarning
               onClick={() => scrollTo('projects')}
-              className="px-6 py-3.5 rounded-xl font-bold text-xs tracking-wider uppercase border border-indigo-600/20 text-indigo-600 hover:bg-indigo-50 hover:border-indigo-600 dark:border-cyan-400/20 dark:text-cyan-400 dark:hover:bg-cyan-950/30 dark:hover:border-cyan-400 transition-all duration-300 cursor-pointer flex items-center justify-center gap-2 w-full sm:w-auto"
+              className="group inline-flex items-center gap-2.5 text-xs uppercase tracking-[0.2em] font-semibold text-white hover:text-zinc-300 transition-colors cursor-pointer"
             >
-              <span>LEARN MORE</span>
+              <span>Learn More</span>
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1.5 transition-transform duration-200" />
             </button>
           </motion.div>
         </div>
-
-        {/* Right column (Illustration) - Hidden on mobile, visible on desktop */}
-        <motion.div
-          variants={{
-            hidden: { opacity: 0, x: 40 },
-            visible: { opacity: 1, x: 0 },
-          }}
-          initial="hidden"
-          animate="visible"
-          transition={{ duration: 0.9, delay: 0.2, ease: [0.16, 1, 0.3, 1] as const }}
-          className="hidden lg:flex lg:col-span-4 justify-center lg:justify-end"
-        >
-          {/* Illustration card with glow */}
-          <motion.div
-            animate={{ y: [0, -10, 0] }}
-            transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
-            className="relative w-[340px] md:w-[460px] lg:w-[500px]"
-          >
-            {/* Glow effect behind image */}
-            <div
-              className="absolute -inset-3 rounded-2xl blur-2xl opacity-35 transition-all duration-500"
-              style={{
-                background: currentTheme === 'dark'
-                  ? 'linear-gradient(135deg, #0e7490 0%, #06b6d4 40%, #0891b2 100%)'
-                  : 'linear-gradient(135deg, #3b82f6 0%, #60a5fa 40%, #93c5fd 100%)',
-              }}
-            />
-            {/* Image container */}
-            <div className="relative rounded-2xl overflow-hidden border border-cyan-500/20 dark:border-cyan-400/20 shadow-2xl shadow-cyan-500/10 transition-colors duration-500">
-              <Image
-                src={currentTheme === 'dark' ? '/final_image.png' : '/final_img_light.png'}
-                alt="Tech Illustration"
-                width={500}
-                height={375}
-                className="object-cover w-full h-auto"
-                priority
-              />
-            </div>
-          </motion.div>
-        </motion.div>
       </div>
 
-      {/* Down Scroll Indicator */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1, duration: 1 }}
-        className="absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5 cursor-pointer z-10"
-        onClick={() => scrollTo('projects')}
-      >
-        <span className="text-[10px] font-semibold tracking-widest uppercase opacity-40 hover:opacity-80 transition-opacity text-zinc-500 dark:text-zinc-400">
-          Scroll Down
-        </span>
-        <div className="w-4.5 h-7 rounded-full border border-zinc-400/40 dark:border-zinc-700/40 flex justify-center p-1">
-          <motion.div
-            animate={{
-              y: [0, 8, 0],
-            }}
-            transition={{
-              duration: 1.5,
-              repeat: Infinity,
-              ease: 'easeInOut',
-            }}
-            className="w-1 h-1.5 rounded-full bg-indigo-500 dark:bg-cyan-400"
-          />
+      {/* ── Animated Social Links Rail (Right Side & Mobile) ── */}
+      <HeroSocials />
+
+      {/* ── Bottom Section: Circular Navigation Controls & Indicators (Matching Video) ── */}
+      <div className="relative z-20 w-full px-6 sm:px-12 lg:px-20 pb-8 sm:pb-12 flex items-center justify-between">
+        {/* Bottom-Left: Two Circular Outline Arrow Buttons (Matching Video ( ^ ) ( v )) */}
+        <div className="flex items-center gap-3">
+          <motion.button
+            suppressHydrationWarning
+            whileHover={{ scale: 1.08 }}
+            whileTap={{ scale: 0.92 }}
+            onClick={() => scrollTo('hero')}
+            className="w-11 h-11 sm:w-12 sm:h-12 rounded-full border border-white/20 bg-white/[0.04] backdrop-blur-md flex items-center justify-center text-zinc-300 hover:text-white hover:border-white/40 transition-all cursor-pointer"
+            title="Scroll to Top"
+            aria-label="Previous Section"
+          >
+            <ArrowUp className="w-4 h-4 stroke-[1.75]" />
+          </motion.button>
+          <motion.button
+            suppressHydrationWarning
+            whileHover={{ scale: 1.08 }}
+            whileTap={{ scale: 0.92 }}
+            onClick={() => scrollTo('projects')}
+            className="w-11 h-11 sm:w-12 sm:h-12 rounded-full border border-white/20 bg-white/[0.04] backdrop-blur-md flex items-center justify-center text-zinc-300 hover:text-white hover:border-white/40 transition-all cursor-pointer"
+            title="Scroll to Projects"
+            aria-label="Next Section"
+          >
+            <ArrowDown className="w-4 h-4 stroke-[1.75]" />
+          </motion.button>
         </div>
-      </motion.div>
+
+        {/* Bottom-Right: Section Counter */}
+        <div className="flex items-center">
+          {/* Section Indicator */}
+          <div className="text-xs font-mono tracking-[0.25em] text-zinc-400">
+            <span className="text-white font-bold">01</span> &nbsp;/&nbsp; 05
+          </div>
+        </div>
+      </div>
     </section>
   );
 }

@@ -1,20 +1,9 @@
 'use client';
 
 import React, { useEffect, useRef } from 'react';
-import { useTheme } from './ThemeProvider';
-
-interface Particle {
-  x: number;
-  y: number;
-  vx: number;
-  vy: number;
-  radius: number;
-  color: string;
-}
 
 export default function ThreeBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const { theme } = useTheme();
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -24,150 +13,187 @@ export default function ThreeBackground() {
     if (!ctx) return;
 
     let animationFrameId: number;
-    let particles: Particle[] = [];
-    const mouse = { x: null as number | null, y: null as number | null, radius: 150 };
+    let width = 0;
+    let height = 0;
 
-    const resizeCanvas = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-      initParticles();
+    // Scroll state tracking
+    let scrollY = typeof window !== 'undefined' ? window.scrollY : 0;
+    let smoothScrollY = scrollY;
+    let isAnimating = true;
+
+    // Intro open animation tracking (runs for ~2.2s on open, then settles)
+    const introStartTime = performance.now();
+    const introDuration = 2200; // ms
+
+    const handleResize = () => {
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      width = canvas.parentElement ? canvas.parentElement.clientWidth : window.innerWidth;
+      height = canvas.parentElement ? canvas.parentElement.clientHeight : window.innerHeight;
+      canvas.width = width * dpr;
+      canvas.height = height * dpr;
+      canvas.style.width = `${width}px`;
+      canvas.style.height = `${height}px`;
+      ctx.scale(dpr, dpr);
+      wakeUp();
     };
 
-    const initParticles = () => {
-      particles = [];
-      // Adjust density based on screen size
-      const particleCount = Math.min(Math.floor((canvas.width * canvas.height) / 15000), 80);
-      
-      const colors = theme === 'dark' 
-        ? ['#6366f1', '#06b6d4', '#4f46e5', '#0891b2'] // Indigo / Cyan shades
-        : ['#6366f1', '#06b6d4', '#4f46e5', '#0891b2']; // Indigo / Cyan shades
+    const handleScroll = () => {
+      scrollY = window.scrollY;
+      wakeUp();
+    };
 
-      for (let i = 0; i < particleCount; i++) {
-        const radius = Math.random() * 2 + 1.5; // Small professional nodes
-        particles.push({
-          x: Math.random() * canvas.width,
-          y: Math.random() * canvas.height,
-          vx: (Math.random() - 0.5) * 0.35, // Slow professional drift
-          vy: (Math.random() - 0.5) * 0.35,
-          radius,
-          color: colors[Math.floor(Math.random() * colors.length)],
-        });
+    const wakeUp = () => {
+      if (!isAnimating) {
+        isAnimating = true;
+        animationFrameId = requestAnimationFrame(render);
       }
     };
 
-    const draw = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      
-      const maxDistance = 110;
-      const length = particles.length;
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    window.addEventListener('scroll', handleScroll, { passive: true });
 
-      for (let i = 0; i < length; i++) {
-        const p = particles[i];
-        
-        // Move particle
-        p.x += p.vx;
-        p.y += p.vy;
+    const isMobile = window.innerWidth < 768;
+    const numSlats = isMobile ? 180 : 320;
 
-        // Bounce off walls
-        if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
-        if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+    const render = () => {
+      const now = performance.now();
+      const introElapsed = now - introStartTime;
+      const isIntroActive = introElapsed < introDuration;
 
-        // Draw particle
+      // 1. Intro progress: 0 on open -> 1 after introDuration
+      const introT = Math.min(1, introElapsed / introDuration);
+      // Smooth cubic ease-out
+      const introEase = 1 - Math.pow(1 - introT, 3);
+      // Dynamic motion flourish during opening
+      const introFlourish = (1 - introEase) * Math.sin(introT * Math.PI * 1.5);
+
+      // 2. Scroll interpolation: smoothly tracks scroll movement
+      const scrollDiff = scrollY - smoothScrollY;
+      smoothScrollY += scrollDiff * 0.08;
+      const scrollVelocity = Math.abs(scrollDiff);
+      const isScrolling = scrollVelocity > 0.05;
+
+      ctx.clearRect(0, 0, width, height);
+
+      // Scroll phase drives the ribbon's 3D wave only when scrolled
+      const scrollPhase = smoothScrollY * 0.0022;
+      // Scroll momentum creates an organic elevation shift
+      const scrollElevationShift = scrollDiff * 0.25;
+
+      // Render the 3D Sculptural Ribbed Ribbon
+      for (let i = 0; i < numSlats; i++) {
+        const t = i / (numSlats - 1); // 0 (bottom-left) to 1 (depth/right)
+
+        // Trajectory across canvas
+        const baseX = -120 + t * (width * 1.15);
+
+        // 3D wave elevation formula:
+        // - Steady resting curve when idle
+        // - Flourishes during opening
+        // - Shifts dynamically with scroll position and velocity
+        const baseWave =
+          Math.sin(t * Math.PI * 1.12 + scrollPhase) * (height * 0.46) -
+          Math.sin(t * Math.PI * 2.2 + scrollPhase * 1.4) * 85;
+
+        const openingWaveOffset =
+          introFlourish * Math.sin(t * Math.PI * 2.5 + introT * 3.5) * (height * 0.18);
+
+        const scrollFlex =
+          (scrollElevationShift / (height || 1)) * 40 * Math.sin(t * Math.PI);
+
+        const y = height * 0.98 - baseWave - openingWaveOffset + scrollFlex;
+        const x = baseX;
+
+        // Expanded ribbon width: spans a much broader, sculptural area across canvas
+        const ribbonW =
+          (520 * (1.0 - t * 0.45) + Math.sin(t * Math.PI) * 220) *
+          (isMobile ? 0.75 : 1.0);
+
+        // Slat angle: twists along curve and reacts subtly to scroll velocity
+        const angle =
+          -Math.PI * 0.22 +
+          Math.sin(t * Math.PI * 1.15 + scrollPhase * 0.5) * 0.18 +
+          (scrollDiff / 500) * 0.08 * Math.sin(t * Math.PI);
+
+        const dx = Math.cos(angle) * (ribbonW * 0.5);
+        const dy = Math.sin(angle) * (ribbonW * 0.5);
+
+        // Stepped extrusion edge on bottom-left (physical 3D slat look)
+        const stepExtrude = Math.max(0.0, (0.42 - t) * 110.0 * introEase);
+
+        const p1x = x - dx - stepExtrude;
+        const p1y = y - dy;
+        const p2x = x + dx;
+        const p2y = y + dy;
+
+        // Lighting model (chiaroscuro):
+        // Bright silver highlight on crest, velvety shadow in crevices
+        const crest = Math.exp(-Math.pow((t - 0.35) / 0.24, 2));
+        const fadeTail = t > 0.75 ? Math.exp(-Math.pow((t - 1.0) / 0.24, 2)) : 1.0;
+
+        const rimAlpha = Math.min(1.0, (0.18 + 0.78 * crest) * fadeTail * (0.6 + 0.4 * introEase));
+        const shadeAlpha = Math.min(1.0, (0.08 + 0.38 * crest) * fadeTail);
+
+        // 1. Shadow gap between slats
         ctx.beginPath();
-        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-        ctx.fillStyle = p.color;
-        ctx.fill();
+        ctx.moveTo(p1x, p1y);
+        ctx.lineTo(p2x, p2y);
+        ctx.strokeStyle = '#050505';
+        ctx.lineWidth = 3.5;
+        ctx.stroke();
 
-        // Lines between particles only appear near the mouse cursor
-        if (mouse.x !== null && mouse.y !== null) {
-          const dxMouse = p.x - mouse.x;
-          const dyMouse = p.y - mouse.y;
-          const distToMouse = Math.sqrt(dxMouse * dxMouse + dyMouse * dyMouse);
+        // 2. Dark silver slat body
+        ctx.beginPath();
+        ctx.moveTo(p1x, p1y);
+        ctx.lineTo(p2x, p2y);
+        ctx.strokeStyle = `rgba(140, 145, 155, ${shadeAlpha.toFixed(3)})`;
+        ctx.lineWidth = 2.0;
+        ctx.stroke();
 
-          if (distToMouse < mouse.radius) {
-            for (let j = i + 1; j < length; j++) {
-              const p2 = particles[j];
-              const dx2Mouse = p2.x - mouse.x;
-              const dy2Mouse = p2.y - mouse.y;
-              const dist2ToMouse = Math.sqrt(dx2Mouse * dx2Mouse + dy2Mouse * dy2Mouse);
+        // 3. Razor-sharp luminous silver rim light on top edge
+        ctx.beginPath();
+        ctx.moveTo(p1x, p1y);
+        ctx.lineTo(p2x, p2y);
+        ctx.strokeStyle = `rgba(235, 240, 250, ${rimAlpha.toFixed(3)})`;
+        ctx.lineWidth = 1.0;
+        ctx.stroke();
 
-              if (dist2ToMouse < mouse.radius) {
-                const dx = p.x - p2.x;
-                const dy = p.y - p2.y;
-                const dist = Math.sqrt(dx * dx + dy * dy);
-
-                if (dist < maxDistance) {
-                  const alpha = (1 - dist / maxDistance) * (theme === 'dark' ? 0.35 : 0.25);
-                  ctx.strokeStyle = theme === 'dark'
-                    ? `rgba(99, 102, 241, ${alpha})`
-                    : `rgba(99, 102, 241, ${alpha})`;
-                  ctx.lineWidth = 1;
-                  ctx.beginPath();
-                  ctx.moveTo(p.x, p.y);
-                  ctx.lineTo(p2.x, p2.y);
-                  ctx.stroke();
-                }
-              }
-            }
-          }
-        }
-
-        // Connect to mouse cursor
-        if (mouse.x !== null && mouse.y !== null) {
-          const dx = p.x - mouse.x;
-          const dy = p.y - mouse.y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-
-          if (dist < mouse.radius) {
-            const alpha = (1 - dist / mouse.radius) * (theme === 'dark' ? 0.55 : 0.40);
-            ctx.strokeStyle = theme === 'dark' 
-              ? `rgba(6, 182, 212, ${alpha})` // Cyan lines to mouse in dark mode
-              : `rgba(6, 182, 212, ${alpha})`; // Cyan lines to mouse in light mode
-            ctx.lineWidth = 1.5;
-            ctx.beginPath();
-            ctx.moveTo(p.x, p.y);
-            ctx.lineTo(mouse.x, mouse.y);
-            ctx.stroke();
-          }
+        // 4. 3D stepped end caps on bottom edge
+        if (stepExtrude > 6) {
+          ctx.beginPath();
+          ctx.moveTo(p1x, p1y);
+          ctx.lineTo(p1x + stepExtrude, p1y + 4);
+          ctx.strokeStyle = `rgba(180, 185, 195, ${(rimAlpha * 0.75).toFixed(3)})`;
+          ctx.lineWidth = 1.6;
+          ctx.stroke();
         }
       }
 
-      animationFrameId = requestAnimationFrame(draw);
+      // If intro has settled and user is not scrolling, pause RAF loop to remain 100% stable
+      if (!isIntroActive && !isScrolling) {
+        smoothScrollY = scrollY;
+        isAnimating = false;
+        return;
+      }
+
+      animationFrameId = requestAnimationFrame(render);
     };
 
-    // Listeners
-    window.addEventListener('resize', resizeCanvas);
-    
-    const handleMouseMove = (e: MouseEvent) => {
-      const rect = canvas.getBoundingClientRect();
-      mouse.x = e.clientX - rect.left;
-      mouse.y = e.clientY - rect.top;
-    };
-
-    const handleMouseLeave = () => {
-      mouse.x = null;
-      mouse.y = null;
-    };
-
-    window.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('mouseleave', handleMouseLeave);
-
-    // Initial setup
-    resizeCanvas();
-    draw();
+    // Start initial intro render
+    animationFrameId = requestAnimationFrame(render);
 
     return () => {
-      window.removeEventListener('resize', resizeCanvas);
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mouseleave', handleMouseLeave);
+      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('scroll', handleScroll);
       cancelAnimationFrame(animationFrameId);
     };
-  }, [theme]);
+  }, []);
 
   return (
     <canvas
       ref={canvasRef}
-      className="absolute inset-0 -z-10 w-full h-full pointer-events-none"
+      className="absolute inset-0 pointer-events-none w-full h-full z-0"
     />
   );
 }
