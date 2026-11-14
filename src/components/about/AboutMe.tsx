@@ -15,6 +15,43 @@ export const GITHUB_USERNAME = 'vinit-singh2007';
  */
 export const FOOD_IMAGES: string[] = [];
 
+/**
+ * Books hobby slideshow — Open Library cover CDN URLs.
+ * Each cycles automatically every 4 seconds.
+ */
+const BOOKS: { title: string; author: string; cover: string }[] = [
+  {
+    title: 'Atomic Habits',
+    author: 'James Clear',
+    cover: 'https://covers.openlibrary.org/b/id/10309343-L.jpg',
+  },
+  {
+    title: 'The Pragmatic Programmer',
+    author: 'Hunt & Thomas',
+    cover: 'https://covers.openlibrary.org/b/id/8775241-L.jpg',
+  },
+  {
+    title: 'Deep Work',
+    author: 'Cal Newport',
+    cover: 'https://covers.openlibrary.org/b/id/9255650-L.jpg',
+  },
+  {
+    title: 'Zero to One',
+    author: 'Peter Thiel',
+    cover: 'https://covers.openlibrary.org/b/id/8229139-L.jpg',
+  },
+  {
+    title: 'Sapiens',
+    author: 'Yuval Noah Harari',
+    cover: 'https://covers.openlibrary.org/b/id/8739161-L.jpg',
+  },
+  {
+    title: 'The Design of Everyday Things',
+    author: 'Don Norman',
+    cover: 'https://covers.openlibrary.org/b/id/7892303-L.jpg',
+  },
+];
+
 /* ── INLINE ICONS ── */
 function LinkedInIcon() {
   return (
@@ -66,6 +103,9 @@ export default function AboutMe() {
   /* ── 2. Photos Slideshow State (Card 4) ── */
   const [photoIndex, setPhotoIndex] = useState<number>(0);
   const [reducedMotion, setReducedMotion] = useState<boolean>(false);
+
+  /* ── 2b. Books Slideshow State (Card 4 — Books) ── */
+  const [bookIndex, setBookIndex] = useState<number>(0);
 
   useEffect(() => {
     const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
