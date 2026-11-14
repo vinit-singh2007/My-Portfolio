@@ -38,7 +38,7 @@ export default function Projects() {
         </motion.p>
       </div>
 
-      {/* ── Featured Bento Grid with Cursor Border Glow ── */}
+      {/* ── Expanding Panels Horizontal Accordion ── */}
       <ProjectsBento />
     </section>
   );
