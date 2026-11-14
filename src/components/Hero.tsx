@@ -10,7 +10,7 @@ import HeroSocials from './HeroSocials';
 import { playNavHoverSound, playNavClickSound } from '@/lib/navSound';
 
 const NAV_LINKS = [
-  { key: 'about', label: 'About Me', targetId: 'skills' },
+  { key: 'about', label: 'What I Am About', targetId: 'about' },
   { key: 'what-i-do', label: 'What I Do', targetId: 'projects' },
   { key: 'experience', label: 'My Experience', targetId: 'experience' },
   { key: 'expertise', label: 'Expertise', targetId: 'skills' },
@@ -115,6 +115,7 @@ export default function Hero() {
       const experienceEl = document.getElementById('experience');
       const skillsEl = document.getElementById('skills');
       const projectsEl = document.getElementById('projects');
+      const aboutEl = document.getElementById('about');
 
       if (contactEl && scrollPosition >= contactEl.offsetTop) {
         setActiveKey('contact');
@@ -126,6 +127,8 @@ export default function Hero() {
         setActiveKey('experience');
       } else if (projectsEl && scrollPosition >= projectsEl.offsetTop) {
         setActiveKey('what-i-do');
+      } else if (aboutEl && scrollPosition >= aboutEl.offsetTop) {
+        setActiveKey('about');
       } else {
         setActiveKey('');
       }
@@ -147,7 +150,10 @@ export default function Hero() {
     setMobileMenuOpen(false);
     const element = document.getElementById(id);
     if (element) {
-      const offsetTop = id === 'hero' || id === 'projects' ? element.offsetTop : element.offsetTop - 70;
+      const offsetTop =
+        id === 'hero' || id === 'about'
+          ? element.offsetTop
+          : element.offsetTop - 70;
       window.scrollTo({
         top: offsetTop >= 0 ? offsetTop : 0,
         behavior: 'smooth',
@@ -244,8 +250,8 @@ export default function Hero() {
             transition={{ duration: 0.2 }}
             className="md:hidden absolute top-24 inset-x-6 z-50 p-6 rounded-2xl bg-[#111111]/95 border border-white/10 backdrop-blur-xl shadow-2xl flex flex-col gap-4 text-center"
           >
-            <button onClick={() => scrollTo('skills')} className="py-2 text-xs font-semibold tracking-[0.2em] uppercase text-zinc-300 hover:text-white">
-              ABOUT ME
+            <button onClick={() => scrollTo('about')} className="py-2 text-xs font-semibold tracking-[0.2em] uppercase text-zinc-300 hover:text-white">
+              WHAT I AM ABOUT
             </button>
             <button onClick={() => scrollTo('projects')} className="py-2 text-xs font-semibold tracking-[0.2em] uppercase text-zinc-300 hover:text-white">
               WHAT I DO

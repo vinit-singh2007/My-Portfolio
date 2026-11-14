@@ -14,10 +14,10 @@ export default function Home() {
       <main className="flex-grow">
         <StackedSections
           hero={<Hero />}
-          sheet={<Projects />}
-          sheetId="projects"
+          sheet={<AboutMe />}
+          sheetId="about"
         />
-        <AboutMe />
+        <Projects />
         <Skills />
         <Experience />
         <Blog />
