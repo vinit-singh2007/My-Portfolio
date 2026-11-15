@@ -1,38 +1,15 @@
 import { NextResponse } from 'next/server';
-import fs from 'fs';
-import path from 'path';
 
 export const revalidate = 3600; // Cache for 1 hour
 
-export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url);
-  const username =
-    searchParams.get('username') ||
-    process.env.GITHUB_USERNAME ||
-    'vinit-singh2007';
-
-  let token = process.env.GITHUB_TOKEN;
-
-  // Fallback to read .env.local directly if process.env wasn't updated without a server restart
-  if (!token) {
-    try {
-      const envPath = path.join(process.cwd(), '.env.local');
-      if (fs.existsSync(envPath)) {
-        const envContent = fs.readFileSync(envPath, 'utf8');
-        const match = envContent.match(/^GITHUB_TOKEN=(.+)$/m);
-        if (match) {
-          token = match[1].trim();
-        }
-      }
-    } catch {
-      // ignore
-    }
-  }
+export async function GET() {
+  const username = process.env.GITHUB_USERNAME || 'vinit-singh2007';
+  const token = process.env.GITHUB_TOKEN;
 
   if (!token) {
     return NextResponse.json(
       {
-        error: 'GITHUB_TOKEN is not configured',
+        error: 'Contributions currently unavailable',
         totalContributions: null,
         days: [],
       },
@@ -83,8 +60,13 @@ export async function GET(request: Request) {
 
     if (!res.ok) {
       return NextResponse.json(
-        { error: 'GitHub API responded with error', totalContributions: null, days: [] },
-        { status: 200 }
+        { error: 'Failed to fetch contribution data', totalContributions: null, days: [] },
+        {
+          status: 200,
+          headers: {
+            'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=86400',
+          },
+        }
       );
     }
 
@@ -93,8 +75,13 @@ export async function GET(request: Request) {
 
     if (!calendar) {
       return NextResponse.json(
-        { error: 'No calendar data found', totalContributions: null, days: [] },
-        { status: 200 }
+        { error: 'Failed to fetch contribution data', totalContributions: null, days: [] },
+        {
+          status: 200,
+          headers: {
+            'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=86400',
+          },
+        }
       );
     }
 
@@ -150,7 +137,12 @@ export async function GET(request: Request) {
   } catch {
     return NextResponse.json(
       { error: 'Failed to fetch contribution data', totalContributions: null, days: [] },
-      { status: 200 }
+      {
+        status: 200,
+        headers: {
+          'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=86400',
+        },
+      }
     );
   }
 }

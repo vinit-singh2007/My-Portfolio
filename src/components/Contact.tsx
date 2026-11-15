@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import confetti from 'canvas-confetti';
 import StepForm, { FormState } from './StepForm';
@@ -8,14 +8,37 @@ import ContactInfo from './ContactInfo';
 
 export default function Contact() {
   const [form, setForm] = useState<FormState>({ name: '', email: '', subject: '', message: '' });
+  const [botcheck, setBotcheck] = useState('');
+  const [cooldown, setCooldown] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
+
+  useEffect(() => {
+    if (cooldown <= 0) return;
+    const timer = setInterval(() => {
+      setCooldown((prev) => (prev > 0 ? prev - 1 : 0));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [cooldown]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    if (cooldown > 0) return;
+
     setIsSubmitting(true);
     setSubmitStatus('idle');
+
+    if (botcheck) {
+      // Honeypot caught bot submission
+      setTimeout(() => {
+        setIsSubmitting(false);
+        setSubmitStatus('success');
+        setForm({ name: '', email: '', subject: '', message: '' });
+        setCooldown(30);
+      }, 500);
+      return;
+    }
 
     const accessKey = process.env.NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY;
     if (!accessKey || accessKey === 'YOUR_ACCESS_KEY_HERE') {
@@ -34,10 +57,11 @@ export default function Contact() {
         },
         body: JSON.stringify({
           access_key: accessKey,
-          name: form.name,
-          email: form.email,
-          subject: form.subject,
-          message: form.message,
+          name: form.name.slice(0, 80),
+          email: form.email.slice(0, 120),
+          subject: form.subject.slice(0, 120),
+          message: form.message.slice(0, 2000),
+          botcheck: '',
           from_name: 'Portfolio Contact Form',
         }),
       });
@@ -63,6 +87,7 @@ export default function Contact() {
       setSubmitStatus('error');
     } finally {
       setIsSubmitting(false);
+      setCooldown(30);
     }
   };
 
@@ -108,6 +133,9 @@ export default function Contact() {
             <StepForm
               form={form}
               setForm={setForm}
+              botcheck={botcheck}
+              setBotcheck={setBotcheck}
+              cooldown={cooldown}
               isSubmitting={isSubmitting}
               submitStatus={submitStatus}
               onSubmit={handleSubmit}

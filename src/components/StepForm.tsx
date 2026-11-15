@@ -22,6 +22,9 @@ const SUBJECT_CHIPS = [
 interface StepFormProps {
   form: FormState;
   setForm: React.Dispatch<React.SetStateAction<FormState>>;
+  botcheck: string;
+  setBotcheck: React.Dispatch<React.SetStateAction<string>>;
+  cooldown?: number;
   isSubmitting: boolean;
   submitStatus: 'idle' | 'success' | 'error';
   onSubmit: (e: React.FormEvent) => Promise<void>;
@@ -31,6 +34,9 @@ interface StepFormProps {
 export default function StepForm({
   form,
   setForm,
+  botcheck,
+  setBotcheck,
+  cooldown = 0,
   isSubmitting,
   submitStatus,
   onSubmit,
@@ -103,6 +109,11 @@ export default function StepForm({
         triggerShake();
         return false;
       }
+      if (form.name.trim().length > 80) {
+        setErrors({ name: 'Name must not exceed 80 characters.' });
+        triggerShake();
+        return false;
+      }
       setErrors((prev) => ({ ...prev, name: undefined }));
       return true;
     }
@@ -111,6 +122,11 @@ export default function StepForm({
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!form.email.trim()) {
         setErrors({ email: 'Email is required.' });
+        triggerShake();
+        return false;
+      }
+      if (form.email.trim().length > 120) {
+        setErrors({ email: 'Email must not exceed 120 characters.' });
         triggerShake();
         return false;
       }
@@ -139,6 +155,11 @@ export default function StepForm({
         triggerShake();
         return false;
       }
+      if (form.subject.trim().length > 120) {
+        setErrors({ subject: 'Subject must not exceed 120 characters.' });
+        triggerShake();
+        return false;
+      }
       setErrors((prev) => ({ ...prev, subject: undefined }));
       return true;
     }
@@ -151,6 +172,11 @@ export default function StepForm({
       }
       if (form.message.trim().length < 10) {
         setErrors({ message: 'Message must be at least 10 characters.' });
+        triggerShake();
+        return false;
+      }
+      if (form.message.trim().length > 2000) {
+        setErrors({ message: 'Message must not exceed 2000 characters.' });
         triggerShake();
         return false;
       }
@@ -288,6 +314,18 @@ export default function StepForm({
 
   return (
     <form ref={formRef} onSubmit={handleFormSubmit} className="w-full flex flex-col justify-between">
+      {/* Honeypot field for bot protection */}
+      <input
+        type="checkbox"
+        name="botcheck"
+        tabIndex={-1}
+        autoComplete="off"
+        checked={Boolean(botcheck)}
+        onChange={(e) => setBotcheck(e.target.checked ? 'true' : '')}
+        style={{ display: 'none' }}
+        className="hidden"
+        aria-hidden="true"
+      />
       {/* ── Top: 4-Segment Progress Bar + Step Counter ── */}
       <div className="flex items-center justify-between mb-8">
         <div
@@ -356,6 +394,7 @@ export default function StepForm({
                     type="text"
                     id="name"
                     name="name"
+                    maxLength={80}
                     value={form.name}
                     onChange={(e) => {
                       setForm((prev) => ({ ...prev, name: e.target.value }));
@@ -405,6 +444,7 @@ export default function StepForm({
                     type="email"
                     id="email"
                     name="email"
+                    maxLength={120}
                     value={form.email}
                     onChange={(e) => {
                       setForm((prev) => ({ ...prev, email: e.target.value }));
@@ -481,6 +521,7 @@ export default function StepForm({
                         type="text"
                         id="subject"
                         name="subject"
+                        maxLength={120}
                         value={form.subject}
                         onChange={(e) => {
                           setForm((prev) => ({ ...prev, subject: e.target.value }));
@@ -528,6 +569,7 @@ export default function StepForm({
                     suppressHydrationWarning
                     id="message"
                     name="message"
+                    maxLength={2000}
                     rows={3}
                     value={form.message}
                     onChange={handleTextareaInput}
@@ -600,8 +642,8 @@ export default function StepForm({
           <button
             type="submit"
             suppressHydrationWarning
-            disabled={isSubmitting}
-            className="px-7 py-2.5 rounded-full bg-[#f97316] text-black text-xs font-bold uppercase tracking-wider hover:bg-[#e55a10] disabled:bg-zinc-800 disabled:text-zinc-500 transition-all cursor-pointer shadow-md shadow-[#f97316]/25 flex items-center gap-2 overflow-hidden relative"
+            disabled={isSubmitting || cooldown > 0}
+            className="px-7 py-2.5 rounded-full bg-[#f97316] text-black text-xs font-bold uppercase tracking-wider hover:bg-[#e55a10] disabled:bg-zinc-800 disabled:text-zinc-500 disabled:cursor-not-allowed transition-all cursor-pointer shadow-md shadow-[#f97316]/25 flex items-center gap-2 overflow-hidden relative"
           >
             <AnimatePresence mode="wait" initial={false}>
               {isSubmitting ? (
@@ -615,6 +657,17 @@ export default function StepForm({
                 >
                   <Loader2 className="w-3.5 h-3.5 animate-spin" />
                   <span>Sending...</span>
+                </motion.div>
+              ) : cooldown > 0 ? (
+                <motion.div
+                  key="cooldown"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.2 }}
+                  className="flex items-center gap-1.5"
+                >
+                  <span>Wait {cooldown}s</span>
                 </motion.div>
               ) : (
                 <motion.div
