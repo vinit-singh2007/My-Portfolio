@@ -273,6 +273,7 @@ export default function ProjectsBento() {
             <button
               key={p.id}
               type="button"
+              suppressHydrationWarning
               onClick={() => setOpenId(p.id)}
               aria-label={`Open ${p.title}`}
               className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${

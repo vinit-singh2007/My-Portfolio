@@ -242,9 +242,9 @@ export default function Hero() {
           </motion.button>
         </div>
 
-        {/* Bottom-Right: Sound Toggle (in flow on mobile, precisely aligned on desktop) */}
+        {/* Bottom-Right: Sound Toggle (hidden on mobile, precisely aligned on desktop) */}
         <div
-          className="pointer-events-auto sm:absolute sm:bottom-0 sm:pb-12"
+          className="hidden sm:block pointer-events-auto sm:absolute sm:bottom-0 sm:pb-12"
           style={{
             right: 'clamp(14px, 2.2vw, 28px)',
           }}

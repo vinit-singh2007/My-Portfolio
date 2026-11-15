@@ -599,10 +599,11 @@ ul.plain li {
 /* ---------- Mobile Responsive Styles for ArticleSlider & MERN Glass Card ---------- */
 @media (max-width: 768px) {
   .wrap {
-    padding: 12px 12px calc(12px + env(safe-area-inset-bottom, 0px));
+    padding: 24px 16px;
     min-height: 100svh;
     height: 100svh;
     width: 100%;
+    display: flex;
     align-items: center;
     justify-content: center;
     box-sizing: border-box;
@@ -613,40 +614,34 @@ ul.plain li {
     display: none !important;
   }
 
-  /* Full-bleed responsive glass sheet */
+  /* Compact, centered glass card without excess bottom space */
   .glass {
     width: 100% !important;
-    max-width: 100% !important;
-    flex: 1 1 auto !important;
-    height: 100% !important;
-    max-height: calc(100svh - 24px) !important;
-    border-radius: 22px !important;
-    padding: 16px 18px 14px !important;
+    max-width: 420px !important;
+    flex: 0 1 auto !important;
+    height: min(470px, calc(100svh - 48px)) !important;
+    max-height: calc(100svh - 48px) !important;
+    border-radius: 24px !important;
+    padding: 18px 20px 14px !important;
+    margin: auto !important;
     display: flex !important;
     flex-direction: column !important;
-    background: rgba(28, 28, 30, 0.78) !important;
+    justify-content: space-between !important;
+    background: rgba(26, 26, 28, 0.82) !important;
     backdrop-filter: blur(28px) saturate(1.1) !important;
     -webkit-backdrop-filter: blur(28px) saturate(1.1) !important;
     border: 1px solid rgba(255, 255, 255, 0.12) !important;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6) !important;
+    box-shadow: 0 25px 70px rgba(0, 0, 0, 0.7) !important;
   }
 
+  /* Hide ornamental wave box on mobile to keep header clean and uncrowded */
   .mark {
-    right: 16px;
-    top: 16px;
-    width: 24px;
-    height: 24px;
-    border-radius: 6px;
-  }
-
-  .mark svg {
-    width: 13px;
-    height: 13px;
+    display: none !important;
   }
 
   .bar {
-    margin-bottom: 10px;
-    padding-right: 32px;
+    margin-bottom: 8px;
+    padding-right: 0;
     flex-shrink: 0;
   }
 
@@ -680,10 +675,10 @@ ul.plain li {
     overflow: hidden;
   }
 
-  /* Slide: scrollable if content overflows viewport */
+  /* Slide: vertically centered with compact padding so no giant empty space */
   .slide {
-    padding: 2px 4px 10px;
-    justify-content: flex-start;
+    padding: 4px 4px 6px;
+    justify-content: center;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
@@ -708,27 +703,27 @@ ul.plain li {
   }
 
   .sub {
-    font-size: 14.5px !important;
-    line-height: 1.4 !important;
-    margin: 2px 0 12px !important;
+    font-size: 14px !important;
+    line-height: 1.35 !important;
+    margin: 2px 0 10px !important;
     color: rgba(244, 242, 236, 0.8) !important;
   }
 
   .slide p,
   .slide li {
     font-size: 13px !important;
-    line-height: 1.65 !important;
+    line-height: 1.6 !important;
     letter-spacing: 0.005em !important;
   }
 
   .slide p {
-    margin: 0 0 10px !important;
+    margin: 0 0 9px !important;
   }
 
   .links {
     font-size: 12px !important;
     gap: 4px 0 !important;
-    margin-top: 8px !important;
+    margin-top: 6px !important;
   }
 
   .links span + span::before {
@@ -740,30 +735,30 @@ ul.plain li {
   }
 
   .road li {
-    padding: 8px 10px 8px 44px !important;
-    margin-bottom: 6px !important;
+    padding: 7px 10px 7px 42px !important;
+    margin-bottom: 5px !important;
     font-size: 12px !important;
-    line-height: 1.4 !important;
+    line-height: 1.35 !important;
     border-radius: 12px !important;
   }
 
   .road li::before {
-    left: 10px !important;
-    width: 24px !important;
-    height: 24px !important;
-    font-size: 11px !important;
+    left: 9px !important;
+    width: 22px !important;
+    height: 22px !important;
+    font-size: 10.5px !important;
   }
 
   .road b {
-    font-size: 12.5px !important;
+    font-size: 12px !important;
     margin-bottom: 1px !important;
   }
 
   .glass pre {
-    padding: 12px 14px !important;
+    padding: 10px 12px !important;
     font-size: 11px !important;
-    line-height: 1.55 !important;
-    margin: 0 0 10px !important;
+    line-height: 1.5 !important;
+    margin: 0 0 8px !important;
     border-radius: 12px !important;
   }
 
@@ -785,7 +780,7 @@ ul.plain li {
 
   /* Navigation at bottom of card */
   .nav {
-    margin-top: 8px !important;
+    margin-top: 6px !important;
     padding-top: 8px !important;
     border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
     flex-shrink: 0 !important;

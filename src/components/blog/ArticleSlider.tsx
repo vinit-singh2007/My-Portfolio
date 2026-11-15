@@ -157,9 +157,25 @@ export default function ArticleSlider({
               </div>
             </div>
             <div className="nav">
-              <button onClick={() => go(idx - 1)} disabled={idx === 0} aria-label="Previous slide"><Chevron dir="l" /></button>
+              <button
+                type="button"
+                suppressHydrationWarning
+                onClick={() => go(idx - 1)}
+                disabled={idx === 0}
+                aria-label="Previous slide"
+              >
+                <Chevron dir="l" />
+              </button>
               <div className="dots">{slides.map((_, i) => <i key={i} className={i === idx ? "on" : ""} />)}</div>
-              <button onClick={() => go(idx + 1)} disabled={idx === n - 1} aria-label="Next slide"><Chevron dir="r" /></button>
+              <button
+                type="button"
+                suppressHydrationWarning
+                onClick={() => go(idx + 1)}
+                disabled={idx === n - 1}
+                aria-label="Next slide"
+              >
+                <Chevron dir="r" />
+              </button>
             </div>
           </article>
         </div>
