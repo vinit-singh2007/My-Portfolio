@@ -26,6 +26,18 @@ export default function ThreeBackground() {
     let introStartTime = performance.now();
     const introDuration = 2600; // ms
 
+    // Declare wakeUp/render as let so they can be referenced before the
+    // const render = () => { ... } assignment below. onOpeningReveal() may
+    // fire synchronously if the opening is already past, causing a TDZ error
+    // if wakeUp or render are declared with const after onOpeningReveal().
+    let render: () => void;
+    const wakeUp = () => {
+      if (!isAnimating) {
+        isAnimating = true;
+        animationFrameId = requestAnimationFrame(render);
+      }
+    };
+
     const unsubscribeReveal = onOpeningReveal(() => {
       introStartTime = performance.now();
       wakeUp();
@@ -48,13 +60,6 @@ export default function ThreeBackground() {
       wakeUp();
     };
 
-    const wakeUp = () => {
-      if (!isAnimating) {
-        isAnimating = true;
-        animationFrameId = requestAnimationFrame(render);
-      }
-    };
-
     handleResize();
     window.addEventListener('resize', handleResize);
     window.addEventListener('scroll', handleScroll, { passive: true });
@@ -62,7 +67,7 @@ export default function ThreeBackground() {
     const isMobile = window.innerWidth < 768;
     const numSlats = isMobile ? 180 : 320;
 
-    const render = () => {
+    render = () => {
       const now = performance.now();
       const introElapsed = now - introStartTime;
       const isIntroActive = introElapsed < introDuration;
