@@ -122,7 +122,8 @@ export default function Hero() {
   return (
     <section
       id="hero"
-      className="relative w-full h-full min-h-screen min-h-[100dvh] flex flex-col justify-between overflow-hidden select-none bg-[#0A0A0A] text-white"
+      className="relative w-full h-full flex flex-col justify-between overflow-hidden select-none bg-[#0A0A0A] text-white"
+      style={{ height: '100%', minHeight: '100%' }}
     >
       {/* ── Background: 3D Sculptural Ribbed Ribbon Canvas + Clean Dark Space ── */}
       <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
@@ -137,14 +138,14 @@ export default function Hero() {
       </div>
 
       {/* Spacer for fixed top navbar */}
-      <div className="w-full h-14 sm:h-20 pointer-events-none shrink-0" />
+      <div className="w-full h-12 sm:h-20 pointer-events-none shrink-0" />
 
       {/* ── Main Landing Content (Exact Layout from Video Reference) ── */}
-      <div className="relative z-10 w-full max-w-7xl mx-auto px-6 sm:px-12 lg:px-20 py-4 sm:py-16 md:py-24 flex-1 flex flex-col justify-center">
-        <div className="max-w-2xl space-y-4 sm:space-y-6">
+      <div className="relative z-10 w-full max-w-7xl mx-auto px-5 sm:px-12 lg:px-20 py-2 sm:py-16 md:py-24 flex-1 flex flex-col justify-center">
+        <div className="max-w-2xl space-y-3 sm:space-y-6">
           {/* Prominent Clean Headline (Live simultaneous typewriter) */}
           <h1
-            className="text-4xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-white leading-[1.08] min-h-[1.1em]"
+            className="text-3xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-white leading-[1.08] min-h-[1.1em]"
           >
             {displayedHeadline}
             {!headlineDone && (
@@ -157,7 +158,7 @@ export default function Hero() {
 
           {/* Subtitle & Role (Live simultaneous typewriter) */}
           <h2
-            className="text-xl sm:text-2xl font-light text-zinc-300 tracking-wide min-h-[1.3em]"
+            className="text-base sm:text-2xl font-light text-zinc-300 tracking-wide min-h-[1.3em]"
           >
             {displayedSubtitle}
             {!subtitleDone && (
@@ -209,9 +210,14 @@ export default function Hero() {
       <SocialRail />
 
       {/* ── Bottom Section: Circular Navigation Controls & Sound Toggle ── */}
-      <div className="relative z-20 w-full px-6 sm:px-12 lg:px-20 pb-5 sm:pb-12 flex items-center justify-between pointer-events-none shrink-0">
+      <div
+        className="relative z-20 w-full px-5 sm:px-12 lg:px-20 pb-5 sm:pb-12 flex items-center justify-between pointer-events-none shrink-0"
+        style={{
+          paddingBottom: 'max(1.25rem, calc(env(safe-area-inset-bottom, 0px) + 0.75rem))',
+        }}
+      >
         {/* Bottom-Left: Two Circular Outline Arrow Buttons (Matching Video ( ^ ) ( v )) */}
-        <div className="flex items-center gap-3 pointer-events-auto">
+        <div className="flex items-center gap-2.5 sm:gap-3 pointer-events-auto">
           <motion.button
             suppressHydrationWarning
             whileHover={{ scale: 1.08 }}
