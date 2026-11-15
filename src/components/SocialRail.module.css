@@ -229,4 +229,8 @@
     border-radius: 11px !important;
     pointer-events: auto !important;
   }
+
+  .xLink {
+    display: none !important;
+  }
 }

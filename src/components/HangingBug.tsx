@@ -165,18 +165,23 @@ export default function HangingBug() {
           }
         }
 
-        /* Hide completely on mobile screens (<= 768px) so it does not collide with mobile header/socials */
-        @media (max-width: 768px) {
+        /* Mobile (<= 768px): positioned cleanly right after the GitHub icon */
+        .bug-fixed-root {
+          top: 0;
+          left: clamp(126px, 34vw, 142px);
+        }
+
+        /* Desktop (> 768px): anchored in the open top-left area */
+        @media (min-width: 769px) {
           .bug-fixed-root {
-            display: none !important;
+            left: clamp(60px, 8vw, 110px);
           }
         }
       `}</style>
 
-      {/* Fixed container anchored to top-left — hidden on mobile (< 768px) */}
+      {/* Fixed container anchored to top-left */}
       <div
-        className="bug-fixed-root hidden md:block fixed z-[9999] pointer-events-none select-none"
-        style={{ top: 0, left: 'clamp(60px, 8vw, 110px)' }}
+        className="bug-fixed-root fixed z-[9999] pointer-events-none select-none"
         aria-hidden="true"
       >
         <div className="bug-wrapper flex flex-col items-center">

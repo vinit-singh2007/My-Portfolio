@@ -144,14 +144,14 @@ export default function SocialRail() {
             <GitHubIcon />
           </a>
 
-          {/* X */}
+          {/* X (Hidden on mobile <= 768px) */}
           <a
             href={SOCIAL_URLS.X_URL}
             target="_blank"
             rel="noopener noreferrer"
             aria-label="X"
             suppressHydrationWarning
-            className={styles.iconLink}
+            className={`${styles.iconLink} ${styles.xLink}`}
           >
             <XIcon />
           </a>
