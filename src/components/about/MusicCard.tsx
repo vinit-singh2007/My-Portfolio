@@ -22,7 +22,6 @@ export interface SongDefinition {
 export const SONGS: SongDefinition[] = [
   { artist: 'The Weeknd', title: 'Starboy' },
   { artist: 'Shubh', title: 'No Love' },
-  { artist: 'The Neighbourhood', title: 'Sweater Weather' },
   { artist: 'Karan Aujla', title: 'Winning Speech' },
   { artist: 'The Weeknd', title: 'After Hours' },
   { artist: 'Shubh', title: 'Cheques' },
@@ -30,6 +29,7 @@ export const SONGS: SongDefinition[] = [
   { artist: 'Sidhu Moose Wala', title: '295' },
   { artist: 'Travis Scott', title: 'FE!N' },
   { artist: 'Shubh', title: 'We Rollin' },
+  { artist: 'The Neighbourhood', title: 'Sweater Weather' },
   // [MORE SONGS I WILL ADD HERE]
 ];
 
@@ -333,7 +333,7 @@ export default function MusicCard({ reducedMotion = false }: MusicCardProps) {
 
       try {
         sessionStorage.setItem(cacheKey, JSON.stringify(resolved));
-      } catch {}
+      } catch { }
 
       setResolvedSongs((prev) => ({ ...prev, [index]: resolved }));
       return resolved;
@@ -360,7 +360,7 @@ export default function MusicCard({ reducedMotion = false }: MusicCardProps) {
 
       try {
         sessionStorage.setItem(cacheKey, JSON.stringify(resolved));
-      } catch {}
+      } catch { }
 
       setResolvedSongs((prev) => ({ ...prev, [index]: resolved }));
       return resolved;
@@ -448,7 +448,7 @@ export default function MusicCard({ reducedMotion = false }: MusicCardProps) {
           audioRef.current
             .play()
             .then(() => setIsPlaying(true))
-            .catch(() => {});
+            .catch(() => { });
         }
         return;
       }
@@ -607,9 +607,8 @@ export default function MusicCard({ reducedMotion = false }: MusicCardProps) {
 
         {/* Vinyl Record (Rotates ONLY while playing) */}
         <div
-          className={`${styles.recordDisc} ${
-            isPlaying && !reducedMotion ? styles.recordPlaying : ''
-          }`}
+          className={`${styles.recordDisc} ${isPlaying && !reducedMotion ? styles.recordPlaying : ''
+            }`}
         >
           {/* Record Label in Centre with Cover Art */}
           <div className={styles.centerLabel}>
@@ -639,9 +638,8 @@ export default function MusicCard({ reducedMotion = false }: MusicCardProps) {
         </div>
       </div>
       <div
-        className={`${styles.tonearmArm} ${
-          isPlaying ? styles.armPlaying : styles.armStopped
-        }`}
+        className={`${styles.tonearmArm} ${isPlaying ? styles.armPlaying : styles.armStopped
+          }`}
         style={reducedMotion ? { transition: 'none' } : undefined}
         aria-hidden="true"
       >
@@ -687,9 +685,8 @@ export default function MusicCard({ reducedMotion = false }: MusicCardProps) {
 
           {/* Indicator Dot */}
           <div
-            className={`${styles.indicatorDot} ${
-              isPlaying ? styles.indicatorPlaying : styles.indicatorPaused
-            }`}
+            className={`${styles.indicatorDot} ${isPlaying ? styles.indicatorPlaying : styles.indicatorPaused
+              }`}
             aria-hidden="true"
             title={isPlaying ? 'Turntable active' : 'Turntable paused'}
           />

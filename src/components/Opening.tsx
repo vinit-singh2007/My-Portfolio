@@ -59,11 +59,12 @@ export default function Opening() {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       setIsDone(true);
       setOpeningActive(false);
-      setOpeningState({ active: false, splitting: true });
+      setOpeningState({ active: false, splitting: true, done: true });
       if (typeof window !== 'undefined') {
         window.__OPENING_ACTIVE__ = false;
         window.__OPENING_DONE__ = true;
         window.dispatchEvent(new CustomEvent('opening-reveal'));
+        window.dispatchEvent(new CustomEvent('opening-done'));
       }
       return;
     }
@@ -72,11 +73,12 @@ export default function Opening() {
     if (window.location.pathname !== '/') {
       setIsDone(true);
       setOpeningActive(false);
-      setOpeningState({ active: false, splitting: true });
+      setOpeningState({ active: false, splitting: true, done: true });
       if (typeof window !== 'undefined') {
         window.__OPENING_ACTIVE__ = false;
         window.__OPENING_DONE__ = true;
         window.dispatchEvent(new CustomEvent('opening-reveal'));
+        window.dispatchEvent(new CustomEvent('opening-done'));
       }
       return;
     }
@@ -121,7 +123,7 @@ export default function Opening() {
       setIsDone(true);
       document.body.style.overflow = '';
       setOpeningActive(false);
-      setOpeningState({ active: false, splitting: true });
+      setOpeningState({ active: false, splitting: true, done: true });
       if (typeof window !== 'undefined') {
         window.__OPENING_ACTIVE__ = false;
         window.__OPENING_DONE__ = true;

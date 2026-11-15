@@ -7,6 +7,9 @@ import ThreeBackground from './ThreeBackground';
 import SocialRail from './SocialRail';
 import SoundToggle from './SoundToggle';
 import { onOpeningReveal } from '@/lib/openingState';
+import dynamic from 'next/dynamic';
+
+const HangingBug = dynamic(() => import('./HangingBug'), { ssr: false });
 
 const FULL_HEADLINE = "YO I'M VINIT";
 const FULL_SUBTITLE = 'Full Stack Engineer & AI Systems Developer';
@@ -243,6 +246,9 @@ export default function Hero() {
       >
         <SoundToggle />
       </div>
+
+      {/* ── Hanging Bug Easter Egg (descends on render, swings, climbs back up) ── */}
+      <HangingBug />
     </section>
   );
 }

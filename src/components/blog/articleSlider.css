@@ -603,3 +603,31 @@ ul.plain li {
     transition: none;
   }
 }
+
+.blog-back-pill {
+  position: fixed;
+  left: max(16px, env(safe-area-inset-left, 0px));
+  top: calc(16px + env(safe-area-inset-top, 0px));
+  z-index: 150;
+  color: #fff;
+  text-decoration: none;
+  font-size: 14px;
+  font-family: var(--font-inter), system-ui, sans-serif;
+  padding: 8px 16px;
+  border-radius: 999px;
+  background: rgba(10, 14, 18, 0.45);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  transition: border-color 0.2s, color 0.2s;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  outline: none;
+}
+
+.blog-back-pill:hover {
+  border-color: #e8651a;
+  color: #e8651a;
+}

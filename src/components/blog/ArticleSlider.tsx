@@ -70,6 +70,20 @@ export default function ArticleSlider({
 
   return (
     <div className="fixed inset-0 z-[120] flex items-center justify-center overflow-hidden">
+      {onClose ? (
+        <button
+          onClick={onClose}
+          className="blog-back-pill"
+          aria-label="Back to blog"
+        >
+          &larr; Blog
+        </button>
+      ) : (
+        <Link href="/#blog" className="blog-back-pill" aria-label="Back to blog">
+          &larr; Blog
+        </Link>
+      )}
+
       <div
         id="bg"
         style={{
@@ -77,7 +91,7 @@ export default function ArticleSlider({
           backgroundColor: banner ? "#2b0615" : undefined,
         }}
       />
-      <Glow />
+      {banner && <Glow />}
 
       <div className={`wrap${banner ? " hero" : ""}`}>
         <div className="frame">
@@ -93,11 +107,11 @@ export default function ArticleSlider({
                   onClick={onClose}
                   className="back bg-transparent border-0 p-0 text-inherit cursor-pointer flex items-center gap-2"
                 >
-                  <ArrowLeft />All posts
+                  <ArrowLeft />Blog
                 </button>
               ) : (
                 <Link className="back" href="/#blog">
-                  <ArrowLeft />All posts
+                  <ArrowLeft />Blog
                 </Link>
               )}
               <span className="count">{idx + 1} / {n}</span>

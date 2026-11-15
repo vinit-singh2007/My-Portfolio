@@ -7,7 +7,7 @@ import styles from "./kaldurg.module.css";
 import { inter, serif, mono } from "./fonts";
 
 const BLOG_URL = "/#blog";
-const POST_DATE = "Nov 15, 2026";
+const POST_DATE = "Oct 4, 2024";
 
 const FACTS = [
   { label: "Height", value: "About 1,500 ft" },
@@ -39,6 +39,7 @@ export default function KaldurgBlog() {
       const y = window.scrollY;
       const h = window.innerHeight;
       const max = document.documentElement.scrollHeight - h;
+      // the photo darkens as you scroll so the text stays readable
       const a = 0.1 + 0.62 * Math.min(1, y / (h * 0.85));
       root.style.setProperty("--a", a.toFixed(3));
       bar.style.width = `${max > 0 ? (y / max) * 100 : 0}%`;
@@ -80,15 +81,18 @@ export default function KaldurgBlog() {
       className={`${styles.page} ${inter.variable} ${serif.variable} ${mono.variable}`}
     >
       <div className={styles.bg} aria-hidden="true">
-        <Image
-          src="/kaldurg.jpg"
-          alt=""
-          fill
-          priority
-          sizes="100vw"
-          quality={75}
-          className={styles.bgImg}
-        />
+        {/* sharp photo centered, with clean normal black background on the sides */}
+        <div className={styles.frame}>
+          <Image
+            src="/images/kaldurg.jpg"
+            alt=""
+            fill
+            priority
+            sizes="(min-width: 1080px) 1080px, 100vw"
+            quality={75}
+            className={styles.bgImg}
+          />
+        </div>
       </div>
       <div className={styles.scrim} aria-hidden="true" />
       <div className={styles.bar} ref={barRef} aria-hidden="true" />

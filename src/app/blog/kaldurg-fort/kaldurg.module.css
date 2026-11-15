@@ -4,22 +4,26 @@
   position: relative;
   isolation: isolate;
   min-height: 100vh;
-  background: #0b1015;
+  background: #000000;
   color: #e9edf1;
   font-family: var(--font-inter), system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 .page * { box-sizing: border-box; }
 
-.bg { position: fixed; inset: 0; z-index: -2; background: #0b1015; }
-.bgImg { object-fit: cover; object-position: 50% 25%; }
+.bg { position: fixed; inset: 0; z-index: -2; background: #000000; overflow: hidden; }
+.frame {
+  position: absolute; top: 0; bottom: 0; left: 50%;
+  width: min(100%, 1080px); transform: translateX(-50%);
+}
+.bgImg { object-fit: cover; object-position: 50% 52%; }
 .scrim {
   position: fixed; inset: 0; z-index: -1;
   background: linear-gradient(
     180deg,
-    rgba(5, 9, 13, calc(var(--a) * 0.7)) 0%,
-    rgba(5, 9, 13, var(--a)) 60%,
-    rgba(5, 9, 13, calc(var(--a) + 0.12)) 100%
+    rgba(0, 0, 0, calc(var(--a) * 0.7)) 0%,
+    rgba(0, 0, 0, var(--a)) 60%,
+    rgba(0, 0, 0, calc(var(--a) + 0.12)) 100%
   );
 }
 .bar {
