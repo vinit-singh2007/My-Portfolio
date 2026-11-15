@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, JetBrains_Mono, Dancing_Script } from "next/font/google";
 import Opening from "@/components/Opening";
 import DesktopSuggestionModal from "@/components/DesktopSuggestionModal";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
 const inter = Inter({
@@ -67,6 +68,7 @@ export default function RootLayout({
         <Opening />
         <DesktopSuggestionModal />
         {children}
+        <Analytics />
       </body>
     </html>
   );
