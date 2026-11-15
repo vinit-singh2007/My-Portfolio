@@ -1,9 +1,24 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { motion, useReducedMotion } from 'framer-motion';
-import { ArrowUpRight, Clock, Calendar } from 'lucide-react';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
+import {
+  ArrowUpRight,
+  Clock,
+  Calendar,
+  ArrowLeft,
+  ChevronLeft,
+  ChevronRight,
+  Equal,
+} from 'lucide-react';
+import ArticleSlider from './blog/ArticleSlider';
+import { articles, Article } from '@/lib/articles';
+
+interface BlogSlide {
+  title: string;
+  points: string[];
+}
 
 interface BlogPost {
   id: number;
@@ -14,41 +29,191 @@ interface BlogPost {
   tag: string;
   slug: string;
   image?: string;
+  slides: BlogSlide[];
 }
 
 const BLOG_POSTS: BlogPost[] = [
   {
     id: 1,
-    title: 'Building Scalable Full-Stack Apps with React & Node.js',
+    title: 'ETHGlobal Mumbai: An Experience Beyond Building',
     excerpt:
-      'A deep dive into architecting production-ready web applications — from component design patterns on the frontend to RESTful API structuring and database optimization on the backend.',
-    date: '2025-10-28',
-    readTime: '8 min read',
-    tag: 'Full-Stack',
-    slug: '#',
-    image: '/project_day0.png',
+      'Three days of learning, building and meeting people from the Web3 ecosystem, and what I took away from it.',
+    date: '2026-11-07',
+    readTime: '4 min read',
+    tag: 'HACKATHON',
+    slug: '/blog/hackathon-mumbai',
+    image: '/ethglobal-mumbai.jpg',
+    slides: [
+      {
+        title: 'ETHGlobal Mumbai: Stepping into the Arena',
+        points: [
+          'Attending ETHGlobal Mumbai was an electrifying immersion into the cutting edge of Web3 and decentralized protocols.',
+          '36 hours of non-stop ideation, architecture design, and sprint development alongside global builders.',
+          'Alongside my friend and teammate Shakti Singh, we took on the challenge to architect and build ORCA.',
+        ],
+      },
+      {
+        title: 'Building ORCA: Hands-on Web3 Engineering',
+        points: [
+          'Engineered ORCA to explore new paradigms in decentralized application workflows and user onboarding.',
+          'Integrated Ethereum smart contracts with reactive frontends using ethers.js / viem and Next.js.',
+          'Navigated contract security, gas optimization tradeoffs, and decentralized storage systems.',
+        ],
+      },
+      {
+        title: 'Hands-on Ethereum & Ecosystem Learnings',
+        points: [
+          'Gained a deep, hands-on understanding of EVM execution, state transitions, and smart contract lifecycles.',
+          'Explored practical, real-world applications of decentralized tech beyond just speculative hype.',
+          'Debugged asynchronous transaction states, RPC latency, and wallet signing edge cases under tight deadlines.',
+        ],
+      },
+      {
+        title: 'The Real Win: Connections & Community',
+        points: [
+          'Met incredible founders, core protocol developers, and passionate builders from across the globe.',
+          'Received hands-on mentorship and technical feedback directly from ecosystem leaders and sponsor teams.',
+          'Forged lasting friendships and experienced the collaborative open-source spirit that defines Web3.',
+        ],
+      },
+      {
+        title: 'Keep Learning. Keep Building. Keep Exploring.',
+        points: [
+          'Hackathons push you to ship fast, embrace ambiguity, and learn ten times faster than in isolation.',
+          'True growth happens when hands-on execution meets community collaboration and high ambition.',
+          'Deeply grateful for the experience, the memories, and everything learned. Ready for what comes next.',
+        ],
+      },
+    ],
   },
   {
     id: 2,
-    title: 'How I Built a Real-Time Deepfake Detection Pipeline',
+    title: 'How I’m Learning the MERN Stack, One Layer at a Time',
     excerpt:
-      'Exploring the AI/ML pipeline behind DeepShield — frame-by-frame lip-sync verification, facial landmark analysis with PyTorch and OpenCV, and temporal anomaly detection across video timelines.',
-    date: '2025-09-15',
-    readTime: '12 min read',
-    tag: 'AI/ML',
-    slug: '#',
-    image: '/project_deepshield.png',
+      'A bottom-up roadmap through MongoDB, Express, React and Node.js, plus the mistakes I made along the way.',
+    date: '2026-11-15',
+    readTime: '7 min read',
+    tag: 'LEARNING',
+    slug: '/blog/learning-mern',
+    image: '/clouds.jpg',
+    slides: [
+      {
+        title: 'Learning MERN',
+        points: [
+          'A full-stack journey from JavaScript to deployed app.',
+          'Understanding how the database, server, and interface talk to each other.',
+          'One language across every layer: MongoDB, Express, React, and Node.js all speak JavaScript.',
+        ],
+      },
+      {
+        title: 'The order that worked for me',
+        points: [
+          '1. Modern JavaScript first: destructuring, promises and async/await.',
+          '2. Node.js and Express: a small REST API before any database.',
+          '3. MongoDB with Mongoose: schemas, then create, read, update, delete.',
+          '4. React for the interface: components, state, effects, fetching.',
+          '5. Connect it and ship it: auth, env variables, deployment.',
+        ],
+      },
+      {
+        title: 'The first thing that made sense',
+        points: [
+          'One Express route talking to MongoDB showed me how the pieces fit.',
+          'app.get("/api/posts", async (req, res) => { const posts = await Post.find().sort({ createdAt: -1 }); res.json(posts); });',
+          'React calls fetch("/api/posts") and renders the result. That round trip is the whole stack in miniature.',
+        ],
+      },
+      {
+        title: 'Mistakes I made so you don’t have to',
+        points: [
+          'Jumping into React before understanding how a server responds.',
+          'Skipping validation, then finding bad data in the database.',
+          'Committing my .env file. Add it to .gitignore on day one.',
+          'Only following tutorials. Building my own small project taught me more.',
+        ],
+      },
+      {
+        title: 'What I’m building next',
+        points: [
+          'My rule now: after every new concept, build something tiny with it the same day.',
+          'Next up is a full CRUD app with login, then a project I can deploy and share.',
+        ],
+      },
+    ],
   },
   {
     id: 3,
+    title: 'How I Built a Real-Time Deepfake Detection Pipeline',
+    excerpt:
+      'Exploring the AI/ML pipeline behind DeepShield — frame-by-frame lip-sync verification, facial landmark analysis with PyTorch and OpenCV, and temporal anomaly detection across video timelines.',
+    date: '2025-10-18',
+    readTime: '12 min read',
+    tag: 'AI/ML',
+    slug: '#deepfake-detection',
+    image: '/project_deepshield.png',
+    slides: [
+      {
+        title: 'Deepfake Detection: The Problem Space',
+        points: [
+          'Generative AI models make synthesizing hyper-realistic facial videos accessible to anyone.',
+          'Traditional single-frame detectors fail on temporal artifacts and subtle facial motion anomalies.',
+          'Engineered DeepShield to provide real-time, frame-by-frame verification pipelines.',
+        ],
+      },
+      {
+        title: 'The Multi-Stage Computer Vision Pipeline',
+        points: [
+          'OpenCV & MediaPipe extract 468 3D facial landmarks per frame at 60 FPS.',
+          'PyTorch neural net compares phoneme audio frequency with viseme lip-geometry synchrony.',
+          'Temporal recurrent blocks detect micro-flicker and boundary blending artifacts across video timelines.',
+        ],
+      },
+      {
+        title: 'Optimizations & Key Learnings',
+        points: [
+          'Model quantization with ONNX Runtime slashed inference latency from 180ms to 24ms per frame.',
+          'Edge caching and batch processing enabled real-time streaming video analysis.',
+          'Synthetic data augmentation was crucial to prevent overfitting on specific lighting conditions.',
+        ],
+      },
+    ],
+  },
+  {
+    id: 4,
     title: 'From Concept to Deploy: Autonomous Drone Fleet Dispatch',
     excerpt:
       'Lessons learned engineering Delivr-X — dynamic 3D route planning, Scikit-Learn battery decay prediction, Google Gemini safety clearance, and real-time WebSocket telemetry at scale.',
     date: '2025-08-03',
     readTime: '10 min read',
     tag: 'Engineering',
-    slug: '#',
+    slug: '#drone-dispatch',
     image: '/project_Delivr-x.png',
+    slides: [
+      {
+        title: 'Engineering Delivr-X: The Drone Dispatch Challenge',
+        points: [
+          'Coordinating autonomous drone delivery across complex, dynamically shifting urban 3D airspace.',
+          'Balancing battery depletion, wind resistance, payload weight, and no-fly zone geo-fencing.',
+          'Designed a centralized real-time telemetry dispatch hub with sub-50ms WebSocket latency.',
+        ],
+      },
+      {
+        title: 'Algorithmic Routing & Machine Learning',
+        points: [
+          'Scikit-Learn battery decay regression models dynamically forecast safe return-to-base thresholds.',
+          'A* 3D pathfinding avoids dynamic obstacles and air-corridor congestion in real time.',
+          'Google Gemini API validates environmental clearances and generates human-readable incident summaries.',
+        ],
+      },
+      {
+        title: 'What Production Taught Me',
+        points: [
+          'Simulate extreme failure states early: packet loss, motor brownouts, and sensor drift.',
+          'Event-driven microservices decouple flight controllers from telemetry logging databases.',
+          'Reliable real-time systems require strict timeout handling and automated failover fallbacks.',
+        ],
+      },
+    ],
   },
 ];
 
@@ -86,7 +251,37 @@ function PlaceholderCover() {
 export default function Blog() {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const [isStackHovered, setIsStackHovered] = useState<boolean>(false);
+  const [activePost, setActivePost] = useState<BlogPost | null>(null);
+  const [activeSlideIndex, setActiveSlideIndex] = useState<number>(0);
+  const [startIndex, setStartIndex] = useState<number>(0);
+  const [activeArticle, setActiveArticle] = useState<Article | null>(null);
   const shouldReduceMotion = useReducedMotion();
+
+  // Close modal on Escape key & arrow navigation & manage body scroll lock
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!activePost) return;
+      if (e.key === 'Escape') {
+        setActivePost(null);
+      } else if (e.key === 'ArrowRight') {
+        setActiveSlideIndex((prev) =>
+          Math.min(activePost.slides.length - 1, prev + 1)
+        );
+      } else if (e.key === 'ArrowLeft') {
+        setActiveSlideIndex((prev) => Math.max(0, prev - 1));
+      }
+    };
+    if (activePost) {
+      document.body.style.overflow = 'hidden';
+      window.addEventListener('keydown', handleKeyDown);
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [activePost]);
 
   return (
     <section
@@ -138,8 +333,10 @@ export default function Blog() {
             height: '490px',
           }}
         >
-          {BLOG_POSTS.slice(0, 3).map((post, index) => {
-            const isHovered = hoveredIndex === index;
+          {[0, 1, 2]
+            .map((offset) => BLOG_POSTS[(startIndex + offset) % BLOG_POSTS.length])
+            .map((post, index) => {
+              const isHovered = hoveredIndex === index;
 
             // ── Positioning & Rotation Specifications ──
             // Left card: -8deg, x: -215px, y: 16px, z: 1
@@ -187,8 +384,16 @@ export default function Blog() {
               <a
                 key={post.id}
                 href={post.slug}
-                target={post.slug !== '#' ? '_blank' : undefined}
-                rel={post.slug !== '#' ? 'noopener noreferrer' : undefined}
+                onClick={(e) => {
+                  e.preventDefault();
+                  const matched = articles.find((a) => post.slug.endsWith(a.slug));
+                  if (matched) {
+                    setActiveArticle(matched);
+                  } else {
+                    setActivePost(post);
+                    setActiveSlideIndex(0);
+                  }
+                }}
                 onMouseEnter={() => setHoveredIndex(index)}
                 onMouseLeave={() => setHoveredIndex(null)}
                 onFocus={() => {
@@ -200,7 +405,7 @@ export default function Blog() {
                   setHoveredIndex(null);
                 }}
                 aria-label={`Read article: ${post.title}`}
-                className="fanned-card absolute block rounded-[28px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e8651a] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0a0a]"
+                className="fanned-card absolute block rounded-[28px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#e8651a] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0a0a] cursor-pointer"
                 style={{
                   width: '330px',
                   height: '430px',
@@ -329,6 +534,216 @@ export default function Blog() {
           })}
         </div>
       </div>
+
+      {/* ── Stack Navigation Dots & Arrows ── */}
+      <div className="flex items-center justify-center gap-3 mt-5">
+        <button
+          onClick={() =>
+            setStartIndex((prev) => (prev - 1 + BLOG_POSTS.length) % BLOG_POSTS.length)
+          }
+          aria-label="Previous article in stack"
+          suppressHydrationWarning
+          className="w-8 h-8 rounded-full border border-zinc-800/80 bg-[#141416]/90 hover:bg-zinc-800 text-zinc-400 hover:text-white flex items-center justify-center transition-all cursor-pointer active:scale-95"
+        >
+          <ChevronLeft className="w-4 h-4" />
+        </button>
+
+        <div className="flex items-center gap-2">
+          {BLOG_POSTS.map((p, i) => (
+            <button
+              key={p.id}
+              onClick={() => setStartIndex(i)}
+              aria-label={`Show stack starting with: ${p.title}`}
+              suppressHydrationWarning
+              className="p-1 cursor-pointer focus:outline-none"
+            >
+              <div
+                className={`h-1.5 rounded-full transition-all duration-300 ${
+                  i === startIndex ? 'w-6 bg-[#e8651a]' : 'w-1.5 bg-zinc-700 hover:bg-zinc-500'
+                }`}
+              />
+            </button>
+          ))}
+        </div>
+
+        <button
+          onClick={() => setStartIndex((prev) => (prev + 1) % BLOG_POSTS.length)}
+          aria-label="Next article in stack"
+          suppressHydrationWarning
+          className="w-8 h-8 rounded-full border border-zinc-800/80 bg-[#141416]/90 hover:bg-zinc-800 text-zinc-400 hover:text-white flex items-center justify-center transition-all cursor-pointer active:scale-95"
+        >
+          <ChevronRight className="w-4 h-4" />
+        </button>
+      </div>
+
+      {/* ── Carousel Reader Modal ── */}
+      <AnimatePresence>
+        {activePost && (
+          <div
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 select-none overflow-hidden"
+            style={{
+              backgroundColor: '#0a0b0d',
+            }}
+            onClick={() => setActivePost(null)}
+          >
+            {/* Live Moving Clouds Video Background */}
+            <video
+              autoPlay
+              loop
+              muted
+              playsInline
+              poster="/cloud_backdrop.png"
+              className="absolute inset-0 w-full h-full object-cover pointer-events-none select-none z-0"
+              src="/clouds.mp4"
+            />
+
+            {/* Ambient Dark Overlay with Vignette & subtle warm orange blur */}
+            <div className="absolute inset-0 bg-black/45 backdrop-blur-[1px] pointer-events-none z-0" />
+            <div
+              className="absolute left-4 sm:left-12 top-1/2 -translate-y-1/2 w-72 h-72 rounded-full pointer-events-none opacity-35 blur-[95px] z-0"
+              style={{ backgroundColor: '#e8651a' }}
+            />
+
+            {/* Central Frosted Glass Card */}
+            <motion.div
+              initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.94, y: 15 }}
+              animate={shouldReduceMotion ? { opacity: 1 } : { opacity: 1, scale: 1, y: 0 }}
+              exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.94, y: 15 }}
+              transition={{ duration: 0.28, ease: [0.2, 0.8, 0.2, 1] }}
+              onClick={(e) => e.stopPropagation()}
+              className="relative z-10 w-full max-w-[470px] min-h-[460px] sm:min-h-[490px] rounded-[28px] p-6 sm:p-7 flex flex-col justify-between text-left shadow-[0_30px_70px_rgba(0,0,0,0.7)]"
+              style={{
+                backgroundColor: 'rgba(26, 28, 31, 0.76)',
+                backdropFilter: 'blur(28px) saturate(180%)',
+                WebkitBackdropFilter: 'blur(28px) saturate(180%)',
+                border: '1px solid rgba(255, 255, 255, 0.12)',
+                boxShadow: '0 25px 60px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.12)',
+              }}
+            >
+              {/* Top Bar: '← All posts' and slide counter '4 / 5' + icon */}
+              <div className="flex items-center justify-between pb-3">
+                <button
+                  onClick={() => setActivePost(null)}
+                  suppressHydrationWarning
+                  className="flex items-center gap-2 text-zinc-300 hover:text-white text-[13px] font-medium transition-colors cursor-pointer group"
+                >
+                  <ArrowLeft className="w-3.5 h-3.5 transition-transform group-hover:-translate-x-0.5" />
+                  <span>All posts</span>
+                </button>
+
+                <div className="flex items-center gap-2.5">
+                  <span className="font-mono text-xs text-zinc-400">
+                    {activeSlideIndex + 1} / {activePost.slides.length}
+                  </span>
+                  <div
+                    className="w-7 h-7 rounded-lg border border-white/10 bg-white/5 flex items-center justify-center text-zinc-300 select-none"
+                    title="Slide view"
+                  >
+                    <Equal className="w-3.5 h-3.5" />
+                  </div>
+                </div>
+              </div>
+
+              {/* Middle Slide Content */}
+              <div className="py-6 flex-1 flex flex-col justify-center">
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={activeSlideIndex}
+                    initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, x: 12 }}
+                    animate={shouldReduceMotion ? { opacity: 1 } : { opacity: 1, x: 0 }}
+                    exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, x: -12 }}
+                    transition={{ duration: 0.22, ease: 'easeOut' }}
+                  >
+                    <h3 className="font-bold text-[19px] sm:text-[20px] text-white tracking-tight leading-snug mb-5">
+                      {activePost.slides[activeSlideIndex]?.title}
+                    </h3>
+                    <ul className="space-y-4">
+                      {activePost.slides[activeSlideIndex]?.points.map((pt, i) => (
+                        <li
+                          key={i}
+                          className="flex items-start gap-2.5 text-[13.5px] sm:text-[14px] leading-relaxed text-zinc-300"
+                        >
+                          <span className="text-zinc-400 select-none mt-[1px] text-base leading-none">•</span>
+                          <span>{pt}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </motion.div>
+                </AnimatePresence>
+              </div>
+
+              {/* Bottom Navigation: <   ••—••   > */}
+              <div className="pt-3 flex items-center justify-between border-t border-white/5">
+                {/* Prev Button */}
+                <button
+                  onClick={() => setActiveSlideIndex((prev) => Math.max(0, prev - 1))}
+                  disabled={activeSlideIndex === 0}
+                  aria-label="Previous slide"
+                  suppressHydrationWarning
+                  className={`w-8 h-8 rounded-full border border-white/10 flex items-center justify-center transition-all ${
+                    activeSlideIndex === 0
+                      ? 'opacity-25 cursor-not-allowed text-zinc-600'
+                      : 'bg-white/5 hover:bg-white/15 text-zinc-300 hover:text-white cursor-pointer active:scale-95'
+                  }`}
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+
+                {/* Pagination Dots */}
+                <div className="flex items-center gap-2">
+                  {activePost.slides.map((_, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => setActiveSlideIndex(idx)}
+                      aria-label={`Go to slide ${idx + 1}`}
+                      suppressHydrationWarning
+                      className="p-1 cursor-pointer focus:outline-none"
+                    >
+                      <div
+                        className={`h-1.5 rounded-full transition-all duration-300 ${
+                          idx === activeSlideIndex
+                            ? 'w-6 bg-[#e8651a]'
+                            : 'w-1.5 bg-zinc-600 hover:bg-zinc-400'
+                        }`}
+                      />
+                    </button>
+                  ))}
+                </div>
+
+                {/* Next Button */}
+                <button
+                  onClick={() =>
+                    setActiveSlideIndex((prev) =>
+                      Math.min(activePost.slides.length - 1, prev + 1)
+                    )
+                  }
+                  disabled={activeSlideIndex === activePost.slides.length - 1}
+                  aria-label="Next slide"
+                  suppressHydrationWarning
+                  className={`w-8 h-8 rounded-full border border-white/10 flex items-center justify-center transition-all ${
+                    activeSlideIndex === activePost.slides.length - 1
+                      ? 'opacity-25 cursor-not-allowed text-zinc-600'
+                      : 'bg-white/5 hover:bg-white/15 text-zinc-300 hover:text-white cursor-pointer active:scale-95'
+                  }`}
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* ── ArticleSlider (ETHGlobal Mumbai Hero Banner & MERN Clouds) ── */}
+      {activeArticle && (
+        <ArticleSlider
+          slides={activeArticle.slides}
+          bg={activeArticle.bg}
+          side={activeArticle.side}
+          banner={activeArticle.banner}
+          onClose={() => setActiveArticle(null)}
+        />
+      )}
 
       {/* ── Responsive Scaling Styles ── */}
       <style jsx>{`
