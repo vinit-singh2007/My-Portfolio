@@ -596,6 +596,220 @@ ul.plain li {
   }
 }
 
+/* ---------- Mobile Responsive Styles for ArticleSlider & MERN Glass Card ---------- */
+@media (max-width: 768px) {
+  .wrap {
+    padding: 12px 12px calc(12px + env(safe-area-inset-bottom, 0px));
+    min-height: 100svh;
+    height: 100svh;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+  }
+
+  /* Hide redundant floating pill on mobile; card header already has native back button */
+  .blog-back-pill {
+    display: none !important;
+  }
+
+  /* Full-bleed responsive glass sheet */
+  .glass {
+    width: 100% !important;
+    max-width: 100% !important;
+    flex: 1 1 auto !important;
+    height: 100% !important;
+    max-height: calc(100svh - 24px) !important;
+    border-radius: 22px !important;
+    padding: 16px 18px 14px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    background: rgba(28, 28, 30, 0.78) !important;
+    backdrop-filter: blur(28px) saturate(1.1) !important;
+    -webkit-backdrop-filter: blur(28px) saturate(1.1) !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6) !important;
+  }
+
+  .mark {
+    right: 16px;
+    top: 16px;
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+  }
+
+  .mark svg {
+    width: 13px;
+    height: 13px;
+  }
+
+  .bar {
+    margin-bottom: 10px;
+    padding-right: 32px;
+    flex-shrink: 0;
+  }
+
+  .back {
+    font-size: 13px;
+    gap: 6px;
+  }
+
+  .count {
+    font-size: 12px;
+    margin-right: 0;
+  }
+
+  .close-btn {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    background: rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.85);
+    display: grid;
+    place-items: center;
+    font-size: 16px;
+    line-height: 1;
+    cursor: pointer;
+  }
+
+  .vp {
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  /* Slide: scrollable if content overflows viewport */
+  .slide {
+    padding: 2px 4px 10px;
+    justify-content: flex-start;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .slide::-webkit-scrollbar {
+    display: none;
+  }
+
+  .glass h1 {
+    font-size: 19px !important;
+    line-height: 1.25 !important;
+    margin: 0 0 4px !important;
+    font-weight: 700 !important;
+  }
+
+  .glass h3 {
+    font-size: 16px !important;
+    line-height: 1.3 !important;
+    margin: 0 0 10px !important;
+    font-weight: 700 !important;
+  }
+
+  .sub {
+    font-size: 14.5px !important;
+    line-height: 1.4 !important;
+    margin: 2px 0 12px !important;
+    color: rgba(244, 242, 236, 0.8) !important;
+  }
+
+  .slide p,
+  .slide li {
+    font-size: 13px !important;
+    line-height: 1.65 !important;
+    letter-spacing: 0.005em !important;
+  }
+
+  .slide p {
+    margin: 0 0 10px !important;
+  }
+
+  .links {
+    font-size: 12px !important;
+    gap: 4px 0 !important;
+    margin-top: 8px !important;
+  }
+
+  .links span + span::before {
+    margin: 0 8px !important;
+  }
+
+  .road {
+    margin-top: 2px;
+  }
+
+  .road li {
+    padding: 8px 10px 8px 44px !important;
+    margin-bottom: 6px !important;
+    font-size: 12px !important;
+    line-height: 1.4 !important;
+    border-radius: 12px !important;
+  }
+
+  .road li::before {
+    left: 10px !important;
+    width: 24px !important;
+    height: 24px !important;
+    font-size: 11px !important;
+  }
+
+  .road b {
+    font-size: 12.5px !important;
+    margin-bottom: 1px !important;
+  }
+
+  .glass pre {
+    padding: 12px 14px !important;
+    font-size: 11px !important;
+    line-height: 1.55 !important;
+    margin: 0 0 10px !important;
+    border-radius: 12px !important;
+  }
+
+  .callout {
+    padding: 10px 14px !important;
+    font-size: 13px !important;
+    line-height: 1.5 !important;
+    margin: 0 0 10px !important;
+    border-radius: 0 10px 10px 0 !important;
+  }
+
+  ul.plain {
+    padding-left: 16px !important;
+  }
+
+  ul.plain li {
+    margin-bottom: 6px !important;
+  }
+
+  /* Navigation at bottom of card */
+  .nav {
+    margin-top: 8px !important;
+    padding-top: 8px !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+    flex-shrink: 0 !important;
+  }
+
+  .nav button {
+    width: 34px !important;
+    height: 34px !important;
+  }
+
+  .dots {
+    gap: 6px !important;
+  }
+
+  .dots i {
+    width: 6px !important;
+    height: 6px !important;
+  }
+
+  .dots i.on {
+    width: 18px !important;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   #bg,
   .track {

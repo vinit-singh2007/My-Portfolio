@@ -93,7 +93,14 @@ export default function ArticleSlider({
       />
       {banner && <Glow />}
 
-      <div className={`wrap${banner ? " hero" : ""}`}>
+      <div
+        className={`wrap${banner ? " hero" : ""}`}
+        onClick={(e) => {
+          if (e.target === e.currentTarget && onClose) {
+            onClose();
+          }
+        }}
+      >
         <div className="frame">
           {banner && (
             // eslint-disable-next-line @next/next/no-img-element
@@ -104,22 +111,43 @@ export default function ArticleSlider({
             <div className="bar">
               {onClose ? (
                 <button
+                  type="button"
                   onClick={onClose}
                   className="back bg-transparent border-0 p-0 text-inherit cursor-pointer flex items-center gap-2"
+                  aria-label="Back to blog"
                 >
                   <ArrowLeft />Blog
                 </button>
               ) : (
-                <Link className="back" href="/#blog">
+                <Link className="back" href="/#blog" aria-label="Back to blog">
                   <ArrowLeft />Blog
                 </Link>
               )}
-              <span className="count">{idx + 1} / {n}</span>
+              <div className="flex items-center gap-3">
+                <span className="count">{idx + 1} / {n}</span>
+                {onClose && (
+                  <button
+                    type="button"
+                    onClick={onClose}
+                    className="close-btn md:hidden"
+                    aria-label="Close"
+                  >
+                    &times;
+                  </button>
+                )}
+              </div>
             </div>
             <div
               ref={vp}
               className={`vp${drag ? " drag" : ""}`}
-              onPointerDown={(e) => { startX.current = e.clientX; setDx(0); setDrag(true); }}
+              onPointerDown={(e) => {
+                startX.current = e.clientX;
+                setDx(0);
+                setDrag(true);
+                try {
+                  e.currentTarget.setPointerCapture(e.pointerId);
+                } catch {}
+              }}
             >
               <div
                 className={`track${drag ? " nodrag" : ""}`}
