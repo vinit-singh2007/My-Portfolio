@@ -6,6 +6,8 @@ interface TextRollLinkProps {
   label: string;
   isActive?: boolean;
   onClick: () => void;
+  onMouseEnter?: () => void;
+  onFocus?: () => void;
   className?: string;
 }
 
@@ -13,6 +15,8 @@ export default function TextRollLink({
   label,
   isActive = false,
   onClick,
+  onMouseEnter,
+  onFocus,
   className = '',
 }: TextRollLinkProps) {
   return (
@@ -20,6 +24,8 @@ export default function TextRollLink({
       type="button"
       suppressHydrationWarning
       onClick={onClick}
+      onMouseEnter={onMouseEnter}
+      onFocus={onFocus}
       aria-label={label}
       className={`nav-text-roll text-xs uppercase tracking-[0.2em] font-medium cursor-pointer focus:outline-none ${
         isActive ? 'is-active' : ''

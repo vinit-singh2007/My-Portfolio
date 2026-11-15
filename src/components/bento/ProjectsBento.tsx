@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import Image from 'next/image';
 import { ArrowRight, ExternalLink } from 'lucide-react';
 import ProjectDetailModal from './ProjectDetailModal';
@@ -31,6 +31,39 @@ export default function ProjectsBento() {
   const [openId, setOpenId] = useState<number>(1);
   const [selectedProject, setSelectedProject] = useState<ProjectItem | null>(null);
 
+  const touchStartX = useRef<number>(0);
+  const touchStartY = useRef<number>(0);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+    touchStartY.current = e.touches[0].clientY;
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent, project: ProjectItem) => {
+    const deltaX = e.changedTouches[0].clientX - touchStartX.current;
+    const deltaY = e.changedTouches[0].clientY - touchStartY.current;
+
+    // Horizontal swipe gesture (> 40px horizontal movement)
+    if (Math.abs(deltaX) > 40 && Math.abs(deltaX) > Math.abs(deltaY) * 1.5) {
+      const currentIndex = PROJECTS.findIndex((p) => p.id === openId);
+      if (deltaX < 0) {
+        // Swiped Left -> go to next project
+        const next = PROJECTS[(currentIndex + 1) % PROJECTS.length];
+        setOpenId(next.id);
+      } else {
+        // Swiped Right -> go to previous project
+        const prev = PROJECTS[(currentIndex - 1 + PROJECTS.length) % PROJECTS.length];
+        setOpenId(prev.id);
+      }
+      return;
+    }
+
+    // Tap on mobile (touch moved less than 12px)
+    if (Math.abs(deltaX) < 12 && Math.abs(deltaY) < 12) {
+      handlePanelClick(project);
+    }
+  };
+
   const currentModalIndex = selectedProject
     ? PROJECTS.findIndex((p) => p.id === selectedProject.id)
     : 0;
@@ -59,6 +92,7 @@ export default function ProjectsBento() {
     <div className="w-full">
       <style>{`
         .accordion-panel {
+          touch-action: pan-y;
           transition: flex 0.5s cubic-bezier(0.2, 0.8, 0.2, 1),
                       height 0.5s cubic-bezier(0.2, 0.8, 0.2, 1),
                       border-color 0.3s ease,
@@ -108,6 +142,8 @@ export default function ProjectsBento() {
               aria-label={`${project.title}${isOpen ? ' (Expanded)' : ''}`}
               suppressHydrationWarning
               onClick={() => handlePanelClick(project)}
+              onTouchStart={handleTouchStart}
+              onTouchEnd={(e) => handleTouchEnd(e, project)}
               onMouseEnter={() => setOpenId(project.id)}
               onFocus={() => setOpenId(project.id)}
               onKeyDown={(e) => handleKeyDown(e, project)}
@@ -225,6 +261,24 @@ export default function ProjectsBento() {
                 </div>
               </div>
             </div>
+          );
+        })}
+      </div>
+
+      {/* ── Mobile Project Indicator Dots (Tap or Swipe to switch on mobile) ── */}
+      <div className="flex md:hidden items-center justify-center gap-2 pt-4 pb-1">
+        {PROJECTS.map((p) => {
+          const isActive = openId === p.id;
+          return (
+            <button
+              key={p.id}
+              type="button"
+              onClick={() => setOpenId(p.id)}
+              aria-label={`Open ${p.title}`}
+              className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${
+                isActive ? 'w-6 bg-[#FF6A1A]' : 'w-1.5 bg-white/20 hover:bg-white/40'
+              }`}
+            />
           );
         })}
       </div>

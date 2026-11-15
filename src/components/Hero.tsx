@@ -5,6 +5,7 @@ import { motion, useReducedMotion } from 'framer-motion';
 import { ArrowUp, ArrowDown, ArrowRight } from 'lucide-react';
 import ThreeBackground from './ThreeBackground';
 import SocialRail from './SocialRail';
+import SoundToggle from './SoundToggle';
 import { onOpeningReveal } from '@/lib/openingState';
 
 const FULL_HEADLINE = "YO I'M VINIT";
@@ -231,6 +232,16 @@ export default function Hero() {
             <ArrowDown className="w-4 h-4 stroke-[1.75]" />
           </motion.button>
         </div>
+      </div>
+
+      {/* ── Sound Toggle (Landing Page Only, aligned with right social rail icons) ── */}
+      <div
+        className="absolute z-20 pb-8 sm:pb-12 bottom-0 pointer-events-auto"
+        style={{
+          right: 'clamp(14px, 2.2vw, 28px)',
+        }}
+      >
+        <SoundToggle />
       </div>
     </section>
   );

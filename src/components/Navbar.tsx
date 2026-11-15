@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X } from 'lucide-react';
 import TextRollLink from './TextRollLink';
-import { playNavHoverSound, playNavClickSound } from '@/lib/navSound';
+import { playNavHoverSound } from '@/lib/navSound';
 import { onOpeningReveal } from '@/lib/openingState';
 
 const NAV_LINKS = [
@@ -90,48 +90,7 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  /* ── 3. Sound Effects ── */
-  useEffect(() => {
-    const attachListeners = (el: HTMLElement | null) => {
-      if (!el) return () => {};
-      const handleMouseOver = (e: MouseEvent) => {
-        const btn = (e.target as HTMLElement).closest('button, a');
-        if (btn && el.contains(btn)) {
-          playNavHoverSound();
-        }
-      };
-      const handleFocusIn = (e: FocusEvent) => {
-        const btn = (e.target as HTMLElement).closest('button, a');
-        if (btn && el.contains(btn)) {
-          playNavHoverSound();
-        }
-      };
-      const handleClick = (e: MouseEvent) => {
-        const btn = (e.target as HTMLElement).closest('button, a');
-        if (btn && el.contains(btn)) {
-          playNavClickSound();
-        }
-      };
-
-      el.addEventListener('mouseover', handleMouseOver);
-      el.addEventListener('focusin', handleFocusIn);
-      el.addEventListener('click', handleClick);
-
-      return () => {
-        el.removeEventListener('mouseover', handleMouseOver);
-        el.removeEventListener('focusin', handleFocusIn);
-        el.removeEventListener('click', handleClick);
-      };
-    };
-
-    const cleanupDesktop = attachListeners(navRef.current);
-    const cleanupMobile = attachListeners(mobileNavRef.current);
-
-    return () => {
-      cleanupDesktop();
-      cleanupMobile();
-    };
-  }, [mobileMenuOpen]);
+  /* ── 3. Sound Effects — wired directly on each link via onMouseEnter ── */
 
   /* ── 4. Smooth Scroll Handler ── */
   const scrollTo = (id: string, key?: string) => {
@@ -172,6 +131,7 @@ export default function Navbar() {
             label={link.label}
             isActive={activeKey === link.key}
             onClick={() => scrollTo(link.targetId, link.key)}
+            onMouseEnter={playNavHoverSound}
           />
         ))}
       </nav>
@@ -206,6 +166,7 @@ export default function Navbar() {
                 type="button"
                 suppressHydrationWarning
                 onClick={() => scrollTo(link.targetId, link.key)}
+                onMouseEnter={playNavHoverSound}
                 className={`py-2 text-xs font-semibold tracking-[0.2em] uppercase transition-colors ${
                   activeKey === link.key ? 'text-[#FF6A1A]' : 'text-zinc-300 hover:text-white'
                 }`}

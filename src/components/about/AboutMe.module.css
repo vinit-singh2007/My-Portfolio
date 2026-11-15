@@ -173,117 +173,432 @@
   box-shadow: 0 0 16px rgba(255, 106, 26, 0.2);
 }
 
-/* ── Card 3: Music ── */
+/* ── Card 3: Music (Realistic Turntable Plinth) ── */
+@property --bg1 {
+  syntax: '<color>';
+  inherits: false;
+  initial-value: hsl(240, 25%, 17%);
+}
+
+@property --bg2 {
+  syntax: '<color>';
+  inherits: false;
+  initial-value: hsl(240, 25%, 9%);
+}
+
+@property --key1 {
+  syntax: '<color>';
+  inherits: false;
+  initial-value: hsl(240, 18%, 25%);
+}
+
+@property --key2 {
+  syntax: '<color>';
+  inherits: false;
+  initial-value: hsl(240, 18%, 16%);
+}
+
+@property --keyEdge {
+  syntax: '<color>';
+  inherits: false;
+  initial-value: hsl(240, 18%, 10%);
+}
+
+@property --artist {
+  syntax: '<color>';
+  inherits: false;
+  initial-value: hsl(240, 18%, 62%);
+}
+
 .cardMusic {
   grid-column: 3;
   grid-row: 1;
-  background: linear-gradient(145deg, #3a1414, #1b0808) !important;
-  border-color: rgba(255, 255, 255, 0.1) !important;
+  aspect-ratio: 1 / 1.04 !important;
+  container-type: size;
+  border-radius: 28px !important;
+  overflow: hidden !important;
+  position: relative !important;
+  padding: 0 !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  box-shadow:
+    inset 1px 1px 0 rgba(255, 255, 255, 0.16),
+    inset -1px -1px 0 rgba(0, 0, 0, 0.4),
+    0 16px 36px rgba(0, 0, 0, 0.5) !important;
+  background: linear-gradient(145deg, var(--bg1, #2b2b30), var(--bg2, #141416)) !important;
   color: #ffffff;
-  min-height: 220px;
+  transition: --bg1 0.8s ease, --bg2 0.8s ease, --key1 0.8s ease, --key2 0.8s ease, --keyEdge 0.8s ease, --artist 0.8s ease;
 }
 
-.vinylDisc {
+.turntableBgLayer {
   position: absolute;
-  top: -24px;
-  left: -24px;
-  width: 146px;
-  height: 146px;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Platter Container: cropped at top and left */
+.platterContainer {
+  position: absolute;
+  left: -19cqw;
+  top: -13cqw;
+  width: 95cqw;
+  height: 95cqw;
   border-radius: 50%;
-  background: repeating-radial-gradient(
-    circle,
-    #181818 0,
-    #181818 3px,
-    #282828 4px,
-    #181818 5px
-  );
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.7);
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* 5px Silver Chrome Rim made with conic-gradient */
+.chromeRim {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: conic-gradient(from 45deg,
+      #71717a 0deg,
+      #f4f4f5 45deg,
+      #52525b 90deg,
+      #e4e4e7 135deg,
+      #3f3f46 180deg,
+      #f4f4f5 225deg,
+      #52525b 270deg,
+      #e4e4e7 315deg,
+      #71717a 360deg);
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.8),
+    inset 0 0 4px rgba(0, 0, 0, 0.7);
+}
+
+/* Vinyl Record Disc (inset by 1.8cqw chrome rim) */
+.recordDisc {
+  position: absolute;
+  inset: 1.8cqw;
+  border-radius: 50%;
+  background: repeating-radial-gradient(circle,
+      #0c0c0e 0,
+      #0c0c0e 2px,
+      #18181c 3px,
+      #0c0c0e 4px);
+  box-shadow: inset 0 0 14px rgba(0, 0, 0, 0.95);
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.vinylCenterLabel {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  background-color: #FF6A1A;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.4);
-}
-
-.vinylCenterHole {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background-color: #000000;
-}
-
-@keyframes spinVinyl {
+@keyframes spinPlatter {
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }
 }
 
-.vinylPlaying {
-  animation: spinVinyl 5s linear infinite;
+.recordPlaying {
+  animation: spinPlatter 5s linear infinite;
 }
 
-/* Tonearm */
-.tonearm {
+/* Static Sheen Overlay (Does NOT rotate) */
+.staticSheen {
   position: absolute;
-  top: 14px;
-  right: 18px;
-  width: 32px;
-  height: 72px;
-  transform-origin: top right;
-  transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+  inset: 1.8cqw;
+  border-radius: 50%;
   pointer-events: none;
+  z-index: 4;
+  background: linear-gradient(135deg,
+      rgba(255, 255, 255, 0.16) 0%,
+      rgba(255, 255, 255, 0.04) 28%,
+      transparent 50%,
+      rgba(255, 255, 255, 0.08) 78%,
+      transparent 100%);
+  mix-blend-mode: screen;
+}
+
+/* Centre Label (55% diameter of record) */
+.centerLabel {
+  position: absolute;
+  width: 55%;
+  height: 55%;
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.8), inset 0 0 4px rgba(0, 0, 0, 0.6);
+  background-color: #FF6A1A;
+  z-index: 3;
+}
+
+.centerCoverImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.spindleHole {
+  position: absolute;
+  width: 2.2cqw;
+  height: 2.2cqw;
+  border-radius: 50%;
+  background-color: #050505;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  box-shadow: 0 0 3px rgba(0, 0, 0, 0.9);
   z-index: 5;
 }
 
-.tonearmStopped {
-  transform: rotate(-24deg);
-}
-
-.tonearmPlaying {
-  transform: rotate(-4deg);
-}
-
-.musicPill {
+/* ── Tonearm Assembly (Top Right) ── */
+.speedSelectorDot {
   position: absolute;
-  bottom: 22px;
-  left: 22px;
-  border-radius: 9999px;
-  background-color: rgba(255, 255, 255, 0.12);
-  border: 1px solid rgba(255, 255, 255, 0.24);
-  color: #ffffff;
-  padding: 6px 14px;
-  font-size: 12px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  cursor: pointer;
-  transition: background-color 0.2s ease, border-color 0.2s ease;
+  top: 14.2cqw;
+  right: 17cqw;
+  width: 1.6cqw;
+  height: 1.6cqw;
+  border-radius: 50%;
+  background-color: #27272a;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.9);
+  pointer-events: none;
   z-index: 10;
 }
 
-.musicPill:hover {
-  background-color: rgba(255, 255, 255, 0.22);
-  border-color: rgba(255, 255, 255, 0.4);
+.tonearmPivot {
+  position: absolute;
+  top: 8.5cqw;
+  right: 2.5cqw;
+  width: 13cqw;
+  height: 13cqw;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #27272a, #111113);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 10;
 }
 
-.musicTrackInfo {
+.pivotRing {
+  width: 9.5cqw;
+  height: 9.5cqw;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: conic-gradient(from 0deg, #52525b, #a1a1aa, #3f3f46, #71717a, #52525b);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pivotKnob {
+  width: 4.2cqw;
+  height: 4.2cqw;
+  border-radius: 50%;
+  background: #18181b;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
+}
+
+.tonearmArm {
   position: absolute;
-  bottom: 22px;
-  right: 22px;
+  top: 15cqw;
+  right: 8.1cqw;
+  width: 1.8cqw;
+  height: 42cqw;
+  transform-origin: 0.9cqw 0px;
+  transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+  background: linear-gradient(to right, #71717a, #f4f4f5 40%, #a1a1aa 60%, #52525b);
+  border-radius: 0.9cqw;
+  box-shadow: -2px 3px 6px rgba(0, 0, 0, 0.5);
+  pointer-events: none;
+  z-index: 11;
+}
+
+.headshell {
+  position: absolute;
+  bottom: -2cqw;
+  left: -0.9cqw;
+  width: 3.6cqw;
+  height: 6.2cqw;
+  border-radius: 0.8cqw;
+  background: #1c1c1f;
+  border: 1px solid #3f3f46;
+  transform: rotate(-14deg);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.7);
+}
+
+.stylusTip {
+  position: absolute;
+  bottom: 0.5cqw;
+  left: 1.4cqw;
+  width: 0.8cqw;
+  height: 1.4cqw;
+  border-radius: 0.2cqw;
+  background: #FF6A1A;
+  box-shadow: 0 0 3px #FF6A1A;
+}
+
+/* Paused vs Playing arm angles */
+.armStopped {
+  transform: rotate(0deg);
+}
+
+.armPlaying {
+  transform: rotate(26deg);
+}
+
+/* ── Track Text (Right Half, above buttons) ── */
+.trackInfoBlock {
+  position: absolute;
+  top: 61cqw;
+  left: 40cqw;
+  right: 6cqw;
   text-align: right;
   z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  pointer-events: none;
+}
+
+.trackTitle {
+  font-size: 6.3cqw;
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1.15;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.trackArtist {
+  font-size: 3.6cqw;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--artist, hsl(240, 15%, 60%));
+  line-height: 1.25;
+  margin-top: 0.8cqw;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── Turntable Bottom Controls ── */
+.turntableControls {
+  position: absolute;
+  top: 85cqw;
+  left: 6cqw;
+  right: 6cqw;
+  z-index: 10;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.leftControls {
+  display: flex;
+  align-items: flex-start;
+  gap: 2cqw;
+}
+
+.rightControls {
+  display: flex;
+  align-items: flex-start;
+  gap: 2.2cqw;
+}
+
+.buttonWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.plinthButton {
+  background: linear-gradient(var(--key1, #3f3f46), var(--key2, #27272a));
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 9999px;
+  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  user-select: none;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.25),
+    0 3px 0 var(--keyEdge, #18181b),
+    0 4px 6px rgba(0, 0, 0, 0.45);
+  transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.8s ease, opacity 0.2s ease;
+  padding: 0;
+}
+
+.plinthButton:hover:not(:disabled) {
+  filter: brightness(1.08);
+}
+
+.plinthButton:active:not(:disabled) {
+  transform: translateY(2px);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.15),
+    0 1px 0 var(--keyEdge, #18181b),
+    0 2px 3px rgba(0, 0, 0, 0.45);
+}
+
+.plinthButton:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  filter: none;
+}
+
+.playButton {
+  width: 15cqw;
+  height: 7.5cqw;
+}
+
+.skipButton {
+  width: 10cqw;
+  height: 7.5cqw;
+}
+
+.btnSubLabel {
+  margin-top: 1.2cqw;
+  height: 2.8cqw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.4cqw;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.6);
+  font-weight: 700;
+  font-family: monospace;
+}
+
+.btnSubLabelIcon {
+  width: 2.8cqw;
+  height: 2.8cqw;
+  color: rgba(255, 255, 255, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Indicator Dot */
+.indicatorDot {
+  width: 1.5cqw;
+  height: 1.5cqw;
+  border-radius: 50%;
+  margin-top: 3cqw;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.indicatorPaused {
+  background-color: #3f3f46;
+  box-shadow: none;
+}
+
+.indicatorPlaying {
+  background-color: #e6c84a;
+  box-shadow: 0 0 6px #e6c84a, 0 0 2px #ffffff;
 }
 
 /* ── Card 4: Photos (kept for reference, now unused) ── */
@@ -375,9 +690,9 @@
   object-fit: cover;
   border-radius: 4px 10px 10px 4px;
   box-shadow:
-    -4px 0 0 0 rgba(0,0,0,0.6),
-    0 8px 32px rgba(0,0,0,0.65),
-    0 2px 8px rgba(0,0,0,0.5);
+    -4px 0 0 0 rgba(0, 0, 0, 0.6),
+    0 8px 32px rgba(0, 0, 0, 0.65),
+    0 2px 8px rgba(0, 0, 0, 0.5);
   transform: perspective(600px) rotateY(-8deg);
   transition: transform 0.4s ease;
 }
@@ -393,7 +708,7 @@
   transform: translateX(-50%);
   width: 80px;
   height: 16px;
-  background: radial-gradient(ellipse, rgba(0,0,0,0.5) 0%, transparent 70%);
+  background: radial-gradient(ellipse, rgba(0, 0, 0, 0.5) 0%, transparent 70%);
   pointer-events: none;
 }
 
@@ -654,6 +969,7 @@
 }
 
 @media (max-width: 768px) {
+
   .cardMusic,
   .cardPhotos,
   .cardBlog {
@@ -686,9 +1002,11 @@
   .vinylDisc {
     animation: none !important;
   }
+
   .tonearm {
     transition: none !important;
   }
+
   .photoSlide {
     transition: none !important;
   }

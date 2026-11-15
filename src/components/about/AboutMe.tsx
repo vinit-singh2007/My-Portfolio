@@ -3,8 +3,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import styles from './AboutMe.module.css';
+import MusicCard, { SONGS } from './MusicCard';
 
 /* ── CONFIGURABLE USER CONSTANTS (Edit as needed) ── */
+export { SONGS };
 export const LINKEDIN_URL = 'https://www.linkedin.com/in/vinitsi-2043-';
 export const BLOG_URL = 'https://github.com/vinit-singh2007';
 export const GITHUB_USERNAME = 'vinit-singh2007';
@@ -120,9 +122,6 @@ function ArrowRightIcon() {
 }
 
 export default function AboutMe() {
-  /* ── 1. Music Player State (Card 3) ── */
-  const [isPlaying, setIsPlaying] = useState<boolean>(false);
-
   /* ── 2. Photos Slideshow State (Card 4) ── */
   const [photoIndex, setPhotoIndex] = useState<number>(0);
   const [reducedMotion, setReducedMotion] = useState<boolean>(false);
@@ -295,6 +294,17 @@ export default function AboutMe() {
                   music is how I unwind once the code is done.
                 </p>
               </div>
+
+              {/* 5. What's next */}
+              <div>
+                <div className={styles.sectionLabel}>What&apos;s next</div>
+                <p className={styles.sectionText}>
+                  Next, I&apos;m going deeper into AI and ML, building products where a model solves
+                  a real problem and a full-stack app puts it in people&apos;s hands. I&apos;m already
+                  working on this with DeepShield and ORCA, and I want to keep building from the
+                  first dataset to the finished product.
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -360,53 +370,7 @@ export default function AboutMe() {
         {/* ══════════════════════════════════════════
             CARD 3: MUSIC (Column 3, row 1)
            ══════════════════════════════════════════ */}
-        <div className={`${styles.cardBase} ${styles.cardMusic}`}>
-          {/* Vinyl Record */}
-          <div
-            className={`${styles.vinylDisc} ${isPlaying && !reducedMotion ? styles.vinylPlaying : ''}`}
-            aria-hidden="true"
-          >
-            <div className={styles.vinylCenterLabel}>
-              <div className={styles.vinylCenterHole} />
-            </div>
-          </div>
-
-          {/* Tonearm */}
-          <div
-            className={`${styles.tonearm} ${isPlaying && !reducedMotion ? styles.tonearmPlaying : styles.tonearmStopped
-              }`}
-            aria-hidden="true"
-          >
-            <svg width="32" height="72" viewBox="0 0 32 72" fill="none">
-              {/* Pivot */}
-              <circle cx="26" cy="6" r="5" fill="#d1d5db" />
-              <circle cx="26" cy="6" r="2.5" fill="#374151" />
-              {/* Arm */}
-              <path d="M26 6 L12 50 L8 64" stroke="#e5e7eb" strokeWidth="2.5" strokeLinecap="round" />
-              {/* Cartridge */}
-              <rect x="3" y="60" width="8" height="10" rx="1.5" fill="#FF6A1A" transform="rotate(-15 7 65)" />
-            </svg>
-          </div>
-
-          {/* Play / Pause Toggle Button */}
-          <button
-            type="button"
-            suppressHydrationWarning
-            onClick={() => setIsPlaying((prev) => !prev)}
-            aria-pressed={isPlaying}
-            className={`${styles.musicPill} ${styles.focusOrange}`}
-          >
-            {isPlaying ? 'Pause' : 'Play'}
-          </button>
-
-          {/* Track Info */}
-          <div className={styles.musicTrackInfo}>
-            <div className="text-xs sm:text-sm font-bold text-white tracking-tight">
-              Your favourite track
-            </div>
-            <div className="text-[11px] text-zinc-400 font-mono">Artist name</div>
-          </div>
-        </div>
+        <MusicCard reducedMotion={reducedMotion} />
 
         {/* ══════════════════════════════════════════
             CARD 4: FOOD PHOTOS — full bleed slideshow
