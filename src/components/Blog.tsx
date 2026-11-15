@@ -143,74 +143,45 @@ const BLOG_POSTS: BlogPost[] = [
   },
   {
     id: 3,
-    title: 'How I Built a Real-Time Deepfake Detection Pipeline',
+    title: 'Sitting on the edge of Kaldurg',
     excerpt:
-      'Exploring the AI/ML pipeline behind DeepShield — frame-by-frame lip-sync verification, facial landmark analysis with PyTorch and OpenCV, and temporal anomaly detection across video timelines.',
-    date: '2025-10-18',
-    readTime: '12 min read',
-    tag: 'AI/ML',
-    slug: '#deepfake-detection',
-    image: '/project_deepshield.png',
+      'A morning on the hill fort that keeps watch over Palghar, and why I came down quieter than I went up.',
+    date: '2026-11-15',
+    readTime: '6 min read',
+    tag: 'TREKKING',
+    slug: '/blog/kaldurg-fort',
+    image: '/kaldurg.jpg',
     slides: [
       {
-        title: 'Deepfake Detection: The Problem Space',
+        title: 'Kaldurg Fort, Palghar',
         points: [
-          'Generative AI models make synthesizing hyper-realistic facial videos accessible to anyone.',
-          'Traditional single-frame detectors fail on temporal artifacts and subtle facial motion anomalies.',
-          'Engineered DeepShield to provide real-time, frame-by-frame verification pipelines.',
+          'Some places only make sense once you stop moving. Kaldurg is one of them.',
+          'The fort sits in Palghar district, roughly 75 km from Mumbai by road.',
+          'I went for the climb. I stayed for the ledge at the top, where the rock simply ends.',
         ],
       },
       {
-        title: 'The Multi-Stage Computer Vision Pipeline',
+        title: 'The climb',
         points: [
-          'OpenCV & MediaPipe extract 468 3D facial landmarks per frame at 60 FPS.',
-          'PyTorch neural net compares phoneme audio frequency with viseme lip-geometry synchrony.',
-          'Temporal recurrent blocks detect micro-flicker and boundary blending artifacts across video timelines.',
+          'The path winds through forest first, with shade and the smell of wet leaves.',
+          'Slowly opens up onto bare rock — steady, and the rocky stretches ask for attention after rain.',
+          'About two hours in, the trees thin out and you can feel the air change.',
         ],
       },
       {
-        title: 'Optimizations & Key Learnings',
+        title: 'The fort at the top',
         points: [
-          'Model quantization with ONNX Runtime slashed inference latency from 180ms to 24ms per frame.',
-          'Edge caching and batch processing enabled real-time streaming video analysis.',
-          'Synthetic data augmentation was crucial to prevent overfitting on specific lighting conditions.',
-        ],
-      },
-    ],
-  },
-  {
-    id: 4,
-    title: 'From Concept to Deploy: Autonomous Drone Fleet Dispatch',
-    excerpt:
-      'Lessons learned engineering Delivr-X — dynamic 3D route planning, Scikit-Learn battery decay prediction, Google Gemini safety clearance, and real-time WebSocket telemetry at scale.',
-    date: '2025-08-03',
-    readTime: '10 min read',
-    tag: 'Engineering',
-    slug: '#drone-dispatch',
-    image: '/project_Delivr-x.png',
-    slides: [
-      {
-        title: 'Engineering Delivr-X: The Drone Dispatch Challenge',
-        points: [
-          'Coordinating autonomous drone delivery across complex, dynamically shifting urban 3D airspace.',
-          'Balancing battery depletion, wind resistance, payload weight, and no-fly zone geo-fencing.',
-          'Designed a centralized real-time telemetry dispatch hub with sub-50ms WebSocket latency.',
+          'What remains is quiet and weathered: water tanks cut into the rock, old fortification.',
+          'From the top you look east toward the Surya river, and west toward the Arabian Sea.',
+          'On a clear day it is a wide, generous view.',
         ],
       },
       {
-        title: 'Algorithmic Routing & Machine Learning',
+        title: 'Doing nothing, on purpose',
         points: [
-          'Scikit-Learn battery decay regression models dynamically forecast safe return-to-base thresholds.',
-          'A* 3D pathfinding avoids dynamic obstacles and air-corridor congestion in real time.',
-          'Google Gemini API validates environmental clearances and generates human-readable incident summaries.',
-        ],
-      },
-      {
-        title: 'What Production Taught Me',
-        points: [
-          'Simulate extreme failure states early: packet loss, motor brownouts, and sensor drift.',
-          'Event-driven microservices decouple flight controllers from telemetry logging databases.',
-          'Reliable real-time systems require strict timeout handling and automated failover fallbacks.',
+          'No phone, no plan, no next step. Just the wind, a very long drop.',
+          'A town that looked like it belonged to a different world.',
+          'That is the real reason I keep going back to the hills.',
         ],
       },
     ],
