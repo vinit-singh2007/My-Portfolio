@@ -122,7 +122,7 @@ export default function Hero() {
   return (
     <section
       id="hero"
-      className="relative w-full h-full min-h-screen flex flex-col justify-between overflow-hidden select-none bg-[#0A0A0A] text-white"
+      className="relative w-full h-full min-h-screen min-h-[100dvh] flex flex-col justify-between overflow-hidden select-none bg-[#0A0A0A] text-white"
     >
       {/* ── Background: 3D Sculptural Ribbed Ribbon Canvas + Clean Dark Space ── */}
       <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
@@ -137,11 +137,11 @@ export default function Hero() {
       </div>
 
       {/* Spacer for fixed top navbar */}
-      <div className="w-full h-16 sm:h-20 pointer-events-none" />
+      <div className="w-full h-14 sm:h-20 pointer-events-none shrink-0" />
 
       {/* ── Main Landing Content (Exact Layout from Video Reference) ── */}
-      <div className="relative z-10 w-full max-w-7xl mx-auto px-6 sm:px-12 lg:px-20 py-16 sm:py-24 flex-1 flex flex-col justify-center">
-        <div className="max-w-2xl space-y-6">
+      <div className="relative z-10 w-full max-w-7xl mx-auto px-6 sm:px-12 lg:px-20 py-4 sm:py-16 md:py-24 flex-1 flex flex-col justify-center">
+        <div className="max-w-2xl space-y-4 sm:space-y-6">
           {/* Prominent Clean Headline (Live simultaneous typewriter) */}
           <h1
             className="text-4xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-white leading-[1.08] min-h-[1.1em]"
@@ -169,7 +169,7 @@ export default function Hero() {
           </h2>
 
           {/* Tailored Solutions Description — typewriter */}
-          <p className="text-sm sm:text-base text-zinc-400 font-light leading-relaxed max-w-xl min-h-[4em]">
+          <p className="text-xs sm:text-sm md:text-base text-zinc-400 font-light leading-relaxed max-w-xl min-h-[3.6em] sm:min-h-[4em]">
             {displayedText.length > 0 && (
               <>
                 <span className="text-[#f97316]">
@@ -191,7 +191,7 @@ export default function Hero() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.25 }}
-            className="pt-2"
+            className="pt-1 sm:pt-2"
           >
             <button
               suppressHydrationWarning
@@ -208,16 +208,16 @@ export default function Hero() {
       {/* ── Animated Social Links Rail (Right Side) ── */}
       <SocialRail />
 
-      {/* ── Bottom Section: Circular Navigation Controls & Indicators (Matching Video) ── */}
-      <div className="relative z-20 w-full px-6 sm:px-12 lg:px-20 pb-8 sm:pb-12 flex items-center justify-between">
+      {/* ── Bottom Section: Circular Navigation Controls & Sound Toggle ── */}
+      <div className="relative z-20 w-full px-6 sm:px-12 lg:px-20 pb-5 sm:pb-12 flex items-center justify-between pointer-events-none shrink-0">
         {/* Bottom-Left: Two Circular Outline Arrow Buttons (Matching Video ( ^ ) ( v )) */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 pointer-events-auto">
           <motion.button
             suppressHydrationWarning
             whileHover={{ scale: 1.08 }}
             whileTap={{ scale: 0.92 }}
             onClick={() => scrollTo('hero')}
-            className="w-11 h-11 sm:w-12 sm:h-12 rounded-full border border-white/20 bg-white/[0.04] backdrop-blur-md flex items-center justify-center text-zinc-300 hover:text-white hover:border-white/40 transition-all cursor-pointer"
+            className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border border-white/20 bg-white/[0.04] backdrop-blur-md flex items-center justify-center text-zinc-300 hover:text-white hover:border-white/40 transition-all cursor-pointer"
             title="Scroll to Top"
             aria-label="Previous Section"
           >
@@ -228,26 +228,26 @@ export default function Hero() {
             whileHover={{ scale: 1.08 }}
             whileTap={{ scale: 0.92 }}
             onClick={() => scrollTo('projects')}
-            className="w-11 h-11 sm:w-12 sm:h-12 rounded-full border border-white/20 bg-white/[0.04] backdrop-blur-md flex items-center justify-center text-zinc-300 hover:text-white hover:border-white/40 transition-all cursor-pointer"
+            className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border border-white/20 bg-white/[0.04] backdrop-blur-md flex items-center justify-center text-zinc-300 hover:text-white hover:border-white/40 transition-all cursor-pointer"
             title="Scroll to Projects"
             aria-label="Next Section"
           >
             <ArrowDown className="w-4 h-4 stroke-[1.75]" />
           </motion.button>
         </div>
+
+        {/* Bottom-Right: Sound Toggle (in flow on mobile, precisely aligned on desktop) */}
+        <div
+          className="pointer-events-auto sm:absolute sm:bottom-0 sm:pb-12"
+          style={{
+            right: 'clamp(14px, 2.2vw, 28px)',
+          }}
+        >
+          <SoundToggle />
+        </div>
       </div>
 
-      {/* ── Sound Toggle (Landing Page Only, aligned with right social rail icons) ── */}
-      <div
-        className="absolute z-20 pb-8 sm:pb-12 bottom-0 pointer-events-auto"
-        style={{
-          right: 'clamp(14px, 2.2vw, 28px)',
-        }}
-      >
-        <SoundToggle />
-      </div>
-
-      {/* ── Hanging Bug Easter Egg (descends on render, swings, climbs back up) ── */}
+      {/* ── Hanging Bug Easter Egg (desktop only, descends after preloader) ── */}
       <HangingBug />
     </section>
   );

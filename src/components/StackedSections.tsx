@@ -47,8 +47,8 @@ export default function StackedSections({
 
   return (
     <div className={`relative w-full ${className}`}>
-      {/* ── 1. Pinned Sticky Hero (position: sticky; top: 0; height: 100vh) ── */}
-      <div className="sticky top-0 h-screen w-full overflow-hidden z-10">
+      {/* ── 1. Pinned Sticky Hero (position: sticky; top: 0; height: 100vh / 100dvh) ── */}
+      <div className="sticky top-0 h-screen h-[100dvh] w-full overflow-hidden z-10">
         <motion.div
           style={{
             scale,
