@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import {
@@ -220,6 +221,7 @@ function PlaceholderCover() {
 }
 
 export default function Blog() {
+  const router = useRouter();
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const [isStackHovered, setIsStackHovered] = useState<boolean>(false);
   const [activePost, setActivePost] = useState<BlogPost | null>(null);
@@ -357,10 +359,15 @@ export default function Blog() {
                 href={post.slug}
                 onClick={(e) => {
                   e.preventDefault();
+                  // If slug is an ArticleSlider article → open the slider overlay
                   const matched = articles.find((a) => post.slug.endsWith(a.slug));
                   if (matched) {
                     setActiveArticle(matched);
+                  } else if (post.slug.startsWith('/blog/')) {
+                    // Real Next.js route → navigate directly to the page
+                    router.push(post.slug);
                   } else {
+                    // Fallback: internal slide carousel modal
                     setActivePost(post);
                     setActiveSlideIndex(0);
                   }
