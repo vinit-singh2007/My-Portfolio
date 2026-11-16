@@ -167,6 +167,7 @@ export default function Navbar() {
                 suppressHydrationWarning
                 onClick={() => scrollTo(link.targetId, link.key)}
                 onMouseEnter={playNavHoverSound}
+                onPointerEnter={playNavHoverSound}
                 className={`py-2 text-xs font-semibold tracking-[0.2em] uppercase transition-colors ${
                   activeKey === link.key ? 'text-[#FF6A1A]' : 'text-zinc-300 hover:text-white'
                 }`}

@@ -25,6 +25,7 @@ export default function TextRollLink({
       suppressHydrationWarning
       onClick={onClick}
       onMouseEnter={onMouseEnter}
+      onPointerEnter={onMouseEnter}
       onFocus={onFocus}
       aria-label={label}
       className={`nav-text-roll text-xs uppercase tracking-[0.2em] font-medium cursor-pointer focus:outline-none ${

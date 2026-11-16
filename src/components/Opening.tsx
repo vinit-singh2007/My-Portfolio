@@ -110,6 +110,7 @@ export default function Opening() {
     // 2 & 3. Hold for 2.6s in total, then split from middle
     const splitTimer = setTimeout(() => {
       setIsSplitting(true);
+      setOpeningActive(false);
       setOpeningState({ active: true, splitting: true });
       if (typeof window !== 'undefined') {
         window.__OPENING_SPLITTING__ = true;
