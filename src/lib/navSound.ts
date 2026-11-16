@@ -14,20 +14,15 @@ let justAutoEnabledTick = 0;
 // ── State: Single Source of Truth ──────────────────────────────────────────
 let soundEnabled = false; // Initial state: Sound is OFF until first user interaction
 let isUnlocked = false; // Initial state: Locked until first user interaction satisfies autoplay policy
+let isUnlocking = false; // Guard flag to guarantee single fire
 let masterVolume = 0.9;
 
-const mutedListeners = new Set<(muted: boolean) => void>();
-const unlockListeners = new Set<(unlocked: boolean) => void>();
+const mutedListeners = new Set<() => void>();
 
 function notifySubscribers() {
   mutedListeners.forEach((fn) => {
     try {
-      fn(!soundEnabled);
-    } catch {}
-  });
-  unlockListeners.forEach((fn) => {
-    try {
-      fn(isUnlocked);
+      fn();
     } catch {}
   });
 }
@@ -37,6 +32,10 @@ export function isSoundEnabled(): boolean {
 }
 
 export function getSoundMuted(): boolean {
+  return !soundEnabled;
+}
+
+export function getSoundMutedSnapshot(): boolean {
   return !soundEnabled;
 }
 
@@ -80,19 +79,10 @@ export function toggleSoundMuted(): boolean {
   return !soundEnabled;
 }
 
-export function subscribeSoundMuted(fn: (muted: boolean) => void): () => void {
+export function subscribeSoundMuted(fn: () => void): () => void {
   mutedListeners.add(fn);
-  fn(!soundEnabled);
   return () => {
     mutedListeners.delete(fn);
-  };
-}
-
-export function subscribeSoundUnlocked(fn: (unlocked: boolean) => void): () => void {
-  unlockListeners.add(fn);
-  fn(isUnlocked);
-  return () => {
-    unlockListeners.delete(fn);
   };
 }
 
@@ -129,66 +119,79 @@ function getContext(): { ctx: AudioContext; master: GainNode } | null {
 
 // ── First-Interaction Auto-Enable Listeners ─────────────────────────────────
 if (typeof window !== 'undefined') {
-  // Preload audio element metadata
+  // Eagerly preload and decode audio on mount
   getHoverAudio();
+  getContext();
 
-  const handleFirstInteraction = async (e: Event) => {
-    // Remove all first-interaction listeners immediately
+  const handleFirstInteraction = (e: Event) => {
+    // 2. SINGLE FIRE: Guard flag prevents duplicate runs
+    if (isUnlocked || isUnlocking) return;
+    isUnlocking = true;
+    justAutoEnabledTick = Date.now();
+
+    // Remove all listeners immediately
     USER_GESTURES.forEach((evt) => {
       window.removeEventListener(evt, handleFirstInteraction, true);
     });
 
-    justAutoEnabledTick = Date.now();
-
-    // a) Resume the AudioContext
+    // 1. DEFER HEAVY WORK: Minimum synchronous execution during the gesture
     const c = getContext();
     if (c && (c.ctx.state as AudioContextState) === 'suspended') {
-      try {
-        await c.ctx.resume();
-      } catch {}
+      c.ctx.resume().catch(() => {});
     }
 
-    // b) Unlock the hover audio element (muted -> play -> pause -> currentTime=0 -> unmuted)
     const audio = getHoverAudio();
     if (audio) {
       try {
         audio.muted = true;
         const playPromise = audio.play();
         if (playPromise !== undefined) {
-          await playPromise;
-          audio.pause();
-          audio.currentTime = 0;
+          playPromise
+            .then(() => {
+              audio.pause();
+              audio.currentTime = 0;
+              audio.muted = false;
+              audio.volume = masterVolume;
+            })
+            .catch(() => {});
         }
       } catch {}
     }
 
-    // c) Set isUnlocked = true and soundEnabled = true
-    isUnlocked = true;
-    soundEnabled = true;
+    const isNavLinkClick =
+      e.target instanceof Element &&
+      Boolean(e.target.closest('header nav, .nav-text-roll, [data-nav-link]'));
 
-    // d) Update the master gain and the audio element's muted/volume
-    if (audio) {
-      audio.muted = false;
-      audio.volume = masterVolume;
-    }
-    if (masterGain) {
-      masterGain.gain.value = masterVolume;
-    }
+    // Move state sync, notifying subscribers, and link preview tap into requestAnimationFrame
+    // so it doesn't block the click's paint frame
+    requestAnimationFrame(() => {
+      isUnlocked = true;
+      soundEnabled = true;
 
-    // e) Notify subscribers so SoundToggle switches to ON immediately
-    notifySubscribers();
+      if (masterGain) {
+        masterGain.gain.value = masterVolume;
+      }
+      if (audio) {
+        audio.muted = false;
+        audio.volume = masterVolume;
+      }
 
-    // Edge case: if first click is on a navbar link, play the tap sound once after unlocking
-    if (e.target instanceof Element && e.target.closest('header nav, .nav-text-roll, [data-nav-link]')) {
-      playTap('hover');
-    }
+      notifySubscribers();
+
+      // If first click was on a navbar link, play tap sound on next frame
+      if (isNavLinkClick) {
+        playTap('hover');
+      }
+    });
   };
 
-  const USER_GESTURES = ['pointerdown', 'click', 'keydown', 'touchstart'] as const;
+  // Prefer listening only to 'pointerdown' and 'keydown' for instantaneous touch/mouse unlock
+  const USER_GESTURES = ['pointerdown', 'keydown'] as const;
 
   USER_GESTURES.forEach((evt) => {
     window.addEventListener(evt, handleFirstInteraction, {
       capture: true,
+      passive: true,
       once: true,
     });
   });

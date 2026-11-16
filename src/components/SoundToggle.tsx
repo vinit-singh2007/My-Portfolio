@@ -1,27 +1,23 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useSyncExternalStore } from 'react';
 import { Volume2, VolumeX } from 'lucide-react';
-import { toggleSoundMuted, subscribeSoundMuted } from '@/lib/navSound';
+import {
+  toggleSoundMuted,
+  subscribeSoundMuted,
+  getSoundMutedSnapshot,
+} from '@/lib/navSound';
 
-export default function SoundToggle() {
-  const [muted, setMuted] = useState<boolean>(true);
-  const [mounted, setMounted] = useState<boolean>(false);
-
-  useEffect(() => {
-    setMounted(true);
-    const unsubMuted = subscribeSoundMuted((isMuted) => {
-      setMuted(isMuted);
-    });
-    return unsubMuted;
-  }, []);
-
-  if (!mounted) return null;
+function SoundToggleComponent() {
+  const muted = useSyncExternalStore(
+    subscribeSoundMuted,
+    getSoundMutedSnapshot,
+    () => true
+  );
 
   return (
     <button
       type="button"
-      suppressHydrationWarning
       onClick={() => toggleSoundMuted()}
       aria-label={muted ? 'Enable sound' : 'Mute sound'}
       title={muted ? 'Enable sound' : 'Mute sound'}
@@ -35,3 +31,5 @@ export default function SoundToggle() {
     </button>
   );
 }
+
+export default React.memo(SoundToggleComponent);
