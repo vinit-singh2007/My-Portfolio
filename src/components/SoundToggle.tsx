@@ -5,7 +5,7 @@ import { Volume2, VolumeX } from 'lucide-react';
 import { toggleSoundMuted, subscribeSoundMuted } from '@/lib/navSound';
 
 export default function SoundToggle() {
-  const [muted, setMuted] = useState<boolean>(true);
+  const [muted, setMuted] = useState<boolean>(false);
   const [mounted, setMounted] = useState<boolean>(false);
 
   useEffect(() => {

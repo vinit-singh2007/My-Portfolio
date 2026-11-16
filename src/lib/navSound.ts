@@ -9,8 +9,8 @@ let audioCtx: AudioContext | null = null;
 let masterGain: GainNode | null = null;
 let lastSoundTime = 0;
 
-// ── Sound closed (muted) by default ───────────────────────────────────────
-let isSoundMuted = true;
+// ── Sound ON by default ───────────────────────────────────────────────────
+let isSoundMuted = false;
 const listeners = new Set<(muted: boolean) => void>();
 
 export function getSoundMuted(): boolean {
