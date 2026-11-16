@@ -9,13 +9,28 @@ let audioCtx: AudioContext | null = null;
 let masterGain: GainNode | null = null;
 let hoverAudio: HTMLAudioElement | null = null;
 let lastSoundTime = 0;
+let justAutoEnabledTick = 0;
 
 // ── State: Single Source of Truth ──────────────────────────────────────────
-let soundEnabled = false; // Sound is OFF (muted) by default
-let isUnlocked = false; // Starts locked until user interaction satisfies autoplay policy
+let soundEnabled = false; // Initial state: Sound is OFF until first user interaction
+let isUnlocked = false; // Initial state: Locked until first user interaction satisfies autoplay policy
 let masterVolume = 0.9;
 
-const listeners = new Set<(muted: boolean) => void>();
+const mutedListeners = new Set<(muted: boolean) => void>();
+const unlockListeners = new Set<(unlocked: boolean) => void>();
+
+function notifySubscribers() {
+  mutedListeners.forEach((fn) => {
+    try {
+      fn(!soundEnabled);
+    } catch {}
+  });
+  unlockListeners.forEach((fn) => {
+    try {
+      fn(isUnlocked);
+    } catch {}
+  });
+}
 
 export function isSoundEnabled(): boolean {
   return soundEnabled;
@@ -51,22 +66,33 @@ export function setSoundMuted(muted: boolean) {
   if (masterGain) {
     masterGain.gain.value = muted ? 0 : masterVolume;
   }
-  if (soundEnabled) {
-    unlockAudio().catch(() => {});
-  }
-  listeners.forEach((fn) => fn(!soundEnabled));
+  notifySubscribers();
 }
 
 export function toggleSoundMuted(): boolean {
+  // Edge case: if the first click is ON the sound toggle itself,
+  // treat it as a normal toggle resulting in sound ON, not "auto-enable then toggle off".
+  if (Date.now() - justAutoEnabledTick < 150) {
+    setSoundMuted(false);
+    return false;
+  }
   setSoundMuted(soundEnabled);
   return !soundEnabled;
 }
 
 export function subscribeSoundMuted(fn: (muted: boolean) => void): () => void {
-  listeners.add(fn);
+  mutedListeners.add(fn);
   fn(!soundEnabled);
   return () => {
-    listeners.delete(fn);
+    mutedListeners.delete(fn);
+  };
+}
+
+export function subscribeSoundUnlocked(fn: (unlocked: boolean) => void): () => void {
+  unlockListeners.add(fn);
+  fn(isUnlocked);
+  return () => {
+    unlockListeners.delete(fn);
   };
 }
 
@@ -101,69 +127,69 @@ function getContext(): { ctx: AudioContext; master: GainNode } | null {
   return { ctx: audioCtx, master: masterGain };
 }
 
-/**
- * Resumes audio context and un-mutes HTML5 audio.
- */
-export async function unlockAudio(): Promise<boolean> {
-  const c = getContext();
-  if (c && (c.ctx.state as AudioContextState) === 'suspended') {
-    try {
-      await c.ctx.resume();
-    } catch {
-      // Autoplay policy prevented resume
-    }
-  }
-
-  const audio = getHoverAudio();
-  if (audio) {
-    try {
-      audio.muted = true;
-      const p = audio.play();
-      if (p !== undefined) {
-        await p;
-        audio.pause();
-        audio.currentTime = 0;
-      }
-      audio.muted = !soundEnabled;
-      audio.volume = soundEnabled ? masterVolume : 0;
-      isUnlocked = true;
-      return true;
-    } catch {
-      // Autoplay blocked without user gesture
-    }
-  }
-
-  if (c && (c.ctx.state as AudioContextState) === 'running') {
-    isUnlocked = true;
-    return true;
-  }
-
-  return false;
-}
-
-// ── Unlock proactively on first user gesture (click, keydown, touchstart) ──
+// ── First-Interaction Auto-Enable Listeners ─────────────────────────────────
 if (typeof window !== 'undefined') {
-  // Eagerly preload hoverAudio on client load
+  // Preload audio element metadata
   getHoverAudio();
 
-  const handleFirstUserInteraction = () => {
-    unlockAudio()
-      .then((unlocked) => {
-        if (unlocked) {
-          USER_GESTURES.forEach((evt) => {
-            window.removeEventListener(evt, handleFirstUserInteraction, true);
-          });
+  const handleFirstInteraction = async (e: Event) => {
+    // Remove all first-interaction listeners immediately
+    USER_GESTURES.forEach((evt) => {
+      window.removeEventListener(evt, handleFirstInteraction, true);
+    });
+
+    justAutoEnabledTick = Date.now();
+
+    // a) Resume the AudioContext
+    const c = getContext();
+    if (c && (c.ctx.state as AudioContextState) === 'suspended') {
+      try {
+        await c.ctx.resume();
+      } catch {}
+    }
+
+    // b) Unlock the hover audio element (muted -> play -> pause -> currentTime=0 -> unmuted)
+    const audio = getHoverAudio();
+    if (audio) {
+      try {
+        audio.muted = true;
+        const playPromise = audio.play();
+        if (playPromise !== undefined) {
+          await playPromise;
+          audio.pause();
+          audio.currentTime = 0;
         }
-      })
-      .catch(() => {});
+      } catch {}
+    }
+
+    // c) Set isUnlocked = true and soundEnabled = true
+    isUnlocked = true;
+    soundEnabled = true;
+
+    // d) Update the master gain and the audio element's muted/volume
+    if (audio) {
+      audio.muted = false;
+      audio.volume = masterVolume;
+    }
+    if (masterGain) {
+      masterGain.gain.value = masterVolume;
+    }
+
+    // e) Notify subscribers so SoundToggle switches to ON immediately
+    notifySubscribers();
+
+    // Edge case: if first click is on a navbar link, play the tap sound once after unlocking
+    if (e.target instanceof Element && e.target.closest('header nav, .nav-text-roll, [data-nav-link]')) {
+      playTap('hover');
+    }
   };
 
-  const USER_GESTURES = ['click', 'keydown', 'touchstart', 'pointerdown'] as const;
+  const USER_GESTURES = ['pointerdown', 'click', 'keydown', 'touchstart'] as const;
 
   USER_GESTURES.forEach((evt) => {
-    window.addEventListener(evt, handleFirstUserInteraction, {
+    window.addEventListener(evt, handleFirstInteraction, {
       capture: true,
-      passive: true,
+      once: true,
     });
   });
 }
@@ -173,9 +199,6 @@ let isOpeningActive = false;
 
 export function setOpeningActive(active: boolean) {
   isOpeningActive = active;
-  if (!active) {
-    unlockAudio().catch(() => {});
-  }
 }
 
 export function isOpeningRunning(): boolean {
@@ -207,15 +230,14 @@ function playTone(ctx: AudioContext, master: GainNode) {
     gain.connect(master);
     osc.start(t);
     osc.stop(t + 0.03);
-  } catch {
-    // Silently ignore audio playback errors
-  }
+  } catch {}
 }
 
 // ── Hover Sound Handler ────────────────────────────────────────────────────
 function playTap(kind: 'hover' | 'click') {
-  if (!soundEnabled) return; // Muted by user
-  if (kind === 'click') return; // Click sound is intentionally disabled
+  // Only play when soundEnabled AND audio is unlocked
+  if (!soundEnabled || !isUnlocked) return;
+  if (kind === 'click') return; // Absolutely NO click sound
   if (typeof window === 'undefined') return;
   if (isOpeningActive) return;
 
@@ -236,16 +258,12 @@ function playTap(kind: 'hover' | 'click') {
 
     const playPromise = audio.play();
     if (playPromise !== undefined) {
-      playPromise
-        .then(() => {
-          isUnlocked = true;
-        })
-        .catch(() => {
-          // If HTML5 Audio was blocked by autoplay before first click, fallback to Web Audio
-          if (c && (c.ctx.state as AudioContextState) === 'running') {
-            playTone(c.ctx, c.master);
-          }
-        });
+      playPromise.catch(() => {
+        // Fallback to Web Audio if HTML5 audio play fails
+        if (c && (c.ctx.state as AudioContextState) === 'running') {
+          playTone(c.ctx, c.master);
+        }
+      });
       return;
     }
   }

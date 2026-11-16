@@ -10,10 +10,10 @@ export default function SoundToggle() {
 
   useEffect(() => {
     setMounted(true);
-    const unsubscribe = subscribeSoundMuted((isMuted) => {
+    const unsubMuted = subscribeSoundMuted((isMuted) => {
       setMuted(isMuted);
     });
-    return unsubscribe;
+    return unsubMuted;
   }, []);
 
   if (!mounted) return null;
