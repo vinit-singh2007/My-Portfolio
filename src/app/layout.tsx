@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Inter, JetBrains_Mono, Dancing_Script } from "next/font/google";
 import Opening from "@/components/Opening";
 import DesktopSuggestionModal from "@/components/DesktopSuggestionModal";
-import PlantCanvas from "@/components/PlantCanvas";
 import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
@@ -68,7 +67,6 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col bg-[#0A0A0A] text-[#EDEDED] antialiased font-[var(--font-inter)] selection:bg-white/20 selection:text-white">
         <Opening />
         <DesktopSuggestionModal />
-        <PlantCanvas />
         {children}
         <Analytics />
       </body>

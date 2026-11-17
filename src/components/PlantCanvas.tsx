@@ -1,495 +1,370 @@
-'use client';
+"use client";
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef } from "react";
+import { usePathname } from "next/navigation";
 
-// ─── Config ──────────────────────────────────────────────────────────────────
-const CFG = {
-  maxPlants: 16,
-  buildTime: 1700,     // ms – total draw time
-  holdTime: 2600,      // ms – pause before fade
-  fadeTime: 1500,      // ms – fade-out duration
-  strokeColor: 'rgb(130,130,130)',
-  dotColor: 'rgb(205,205,205)',
+/* ------------------------------------------------------------------ */
+/*  Click anywhere -> a small potted plant draws itself at that point  */
+/*  Active only on landing page.                                       */
+/*  Add data-no-doodle to any element that should NOT trigger a plant. */
+/* ------------------------------------------------------------------ */
+
+const CONFIG = {
+  ink: "130,130,130", // stroke colour (dark grey)
+  pen: "205,205,205", // little dot that rides the pen tip
   lineWidth: 1.3,
-  resampleStep: 2.5,   // px between resampled points
-  wobbleAmp: 0.45,     // px of hand-drawn wobble
-  tiltRange: 7,        // ± degrees of random tilt
-  plantMinH: 45,       // px
-  plantMaxH: 75,       // px
-  staggerFrac: 0.18,   // fraction of buildTime to stagger each path
-  dotRadius: 2.2,
+  buildMs: 1700, // time to draw the plant
+  holdMs: 2600, // time it stays visible
+  fadeMs: 1500, // fade-out time
+  maxPlants: 16,
+  zIndex: 40, // above background and hero (z-10), below nav (z-50)
 };
 
-// ─── Math helpers ─────────────────────────────────────────────────────────────
-function rand(a: number, b: number) { return a + Math.random() * (b - a); }
-function clamp(v: number, lo: number, hi: number) { return Math.max(lo, Math.min(hi, v)); }
-function lerp(a: number, b: number, t: number) { return a + (b - a) * t; }
-function easeInOut(t: number) { return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t; }
-function rotPt(x: number, y: number, a: number): [number, number] {
-  const c = Math.cos(a), s = Math.sin(a);
-  return [x * c - y * s, x * s + y * c];
-}
-function transPts(pts: [number, number][], dx: number, dy: number): [number, number][] {
-  return pts.map(([x, y]) => [x + dx, y + dy]);
-}
-function rotPts(pts: [number, number][], a: number): [number, number][] {
-  return pts.map(([x, y]) => rotPt(x, y, a));
+type Pt = [number, number];
+type Path = Pt[];
+type Prepared = { pts: Pt[]; cum: number[]; total: number };
+type Item = { x: number; y: number; rot: number; born: number; paths: Prepared[] };
+type LeafType = "round" | "lens" | "teardrop";
+
+const PI = Math.PI;
+const TAU = Math.PI * 2;
+const rnd = (a: number, b: number) => a + Math.random() * (b - a);
+const easeInOut = (x: number) => (x < 0.5 ? 2 * x * x : 1 - Math.pow(-2 * x + 2, 2) / 2);
+
+/* ---------- geometry helpers ---------- */
+
+function arc(cx: number, cy: number, rx: number, ry: number, a0: number, a1: number): Path {
+  const n = Math.max(10, Math.round((Math.abs(a1 - a0) / TAU) * 48));
+  const p: Path = [];
+  for (let i = 0; i <= n; i++) {
+    const a = a0 + ((a1 - a0) * i) / n;
+    p.push([cx + rx * Math.cos(a), cy + ry * Math.sin(a)]);
+  }
+  return p;
 }
 
-// ─── Resample + wobble ────────────────────────────────────────────────────────
-function resample(pts: [number, number][], step: number): [number, number][] {
-  if (pts.length < 2) return pts;
-  const out: [number, number][] = [pts[0]];
-  let carry = 0;
-  for (let i = 1; i < pts.length; i++) {
-    const dx = pts[i][0] - pts[i - 1][0];
-    const dy = pts[i][1] - pts[i - 1][1];
-    const seg = Math.hypot(dx, dy);
-    if (seg === 0) continue;
-    let d = carry;
-    while (d < seg) {
-      const t = d / seg;
-      out.push([pts[i - 1][0] + dx * t, pts[i - 1][1] + dy * t]);
-      d += step;
-    }
-    carry = d - seg;
+// rotate by `ang`, then move to (bx, by)
+function place(p: Path, ang: number, bx: number, by: number): Path {
+  const c = Math.cos(ang);
+  const s = Math.sin(ang);
+  return p.map(([x, y]) => [x * c - y * s + bx, x * s + y * c + by]);
+}
+
+// leaf outlines: base at the origin, pointing along +x
+function leafPaths(type: LeafType, len: number): Path[] {
+  if (type === "round") return [arc(len * 0.5, 0, len * 0.5, len * 0.5, PI, PI + TAU)];
+  const p: Path = [];
+  const w = type === "lens" ? len * 0.28 : len * 0.3;
+  const shape = (x: number) => (type === "lens" ? Math.sin(PI * x) : Math.sin(PI * Math.pow(x, 0.6)));
+  for (let i = 0; i <= 20; i++) {
+    const x = i / 20;
+    p.push([len * x, -w * shape(x)]);
   }
-  out.push(pts[pts.length - 1]);
+  for (let i = 20; i >= 0; i--) {
+    const x = i / 20;
+    p.push([len * x, w * shape(x)]);
+  }
+  return [p];
+}
+
+/* ---------- the plants ---------- */
+
+const TOP_COUNT = 6;
+
+function makePlant(lastTop: number): { paths: Path[]; top: number } {
+  const u = rnd(10, 14); // base unit, whole plant is roughly 4-5 units tall
+  const w = u * 0.9;
+  const h = u * 0.9;
+  const H = u * rnd(2.2, 3);
+  const lean = rnd(-0.5, 0.5) * u;
+  const P: Path[] = [];
+
+  // pot (3 variants)
+  const pot = Math.floor(rnd(0, 3));
+  if (pot === 0) P.push([...arc(0, 0, w, h, 0, PI), [w, 0]]); // bowl
+  else if (pot === 1) P.push([[-w, 0], [w, 0], [w * 0.7, h], [-w * 0.7, h], [-w, 0]]); // trapezoid
+  else P.push([[-w * 0.8, 0], [w * 0.8, 0], [w * 0.8, h], [-w * 0.8, h], [-w * 0.8, 0]]); // box
+
+  const stem = (hh: number, l: number) => {
+    const s: Path = [];
+    for (let i = 0; i <= 20; i++) {
+      const t = i / 20;
+      s.push([l * t * t, -hh * t]);
+    }
+    P.push(s);
+  };
+  const leaf = (type: LeafType, len: number, ang: number, bx: number, by: number) =>
+    leafPaths(type, len).forEach((p) => P.push(place(p, ang, bx, by)));
+
+  let top = 0;
+  do {
+    top = Math.floor(rnd(0, TOP_COUNT));
+  } while (top === lastTop);
+
+  switch (top) {
+    case 0: // sprout: two round leaves
+      stem(H * 0.8, lean);
+      [-1, 1].forEach((s) => leaf("round", u * 0.9, -PI / 2 + s * 0.9, lean, -H * 0.8));
+      break;
+    case 1: // oval plant: three lens leaves
+      stem(H, lean);
+      [0.45, 0.7, 1].forEach((t, k) =>
+        leaf("lens", u * 1.1, k === 2 ? -PI / 2 : -PI / 2 + (k % 2 ? 1 : -1), lean * t * t, -H * t)
+      );
+      break;
+    case 2: {
+      // tulip
+      stem(H * 0.8, lean);
+      const b = u * 0.6;
+      const cy = -H * 0.8;
+      P.push([
+        [lean - b, cy - b * 1.5],
+        [lean - b, cy - b * 0.5],
+        ...arc(lean, cy - b * 0.5, b, b, PI, 0),
+        [lean + b, cy - b * 1.5],
+        [lean + b * 0.5, cy - b],
+        [lean, cy - b * 1.5],
+        [lean - b * 0.5, cy - b],
+        [lean - b, cy - b * 1.5],
+      ]);
+      break;
+    }
+    case 3: // succulent: three pointed petals, no stem
+      [-0.75, 0, 0.75].forEach((a) => leaf("lens", u * 1.7, -PI / 2 + a, 0, 0));
+      break;
+    case 4: // grass tuft: three curved blades
+      [-1, 0, 1].forEach((s) => {
+        const hh = u * rnd(1.8, 3);
+        const bx = s * u * 0.35;
+        const p: Path = [];
+        for (let i = 0; i <= 16; i++) {
+          const t = i / 16;
+          p.push([bx + s * u * 0.55 * t * t, -hh * t]);
+        }
+        P.push(p);
+      });
+      break;
+    default: // teardrop pair on a Y stem
+      stem(H * 0.55, 0);
+      P.push([[0, -H * 0.55], [-u * 0.9, -H * 0.8]], [[0, -H * 0.55], [u * 0.9, -H * 0.8]]);
+      leaf("teardrop", u * 1.2, -PI / 2 - 0.5, -u * 0.9, -H * 0.8);
+      leaf("teardrop", u * 1.2, -PI / 2 + 0.5, u * 0.9, -H * 0.8);
+  }
+
+  // shift down so the click point sits near the middle of the plant
+  return { paths: P.map((p) => p.map(([x, y]) => [x, y + u * 1.4] as Pt)), top };
+}
+
+/* ---------- hand-drawn feel + progressive drawing ---------- */
+
+// insert points every ~2.5px so wobble and partial drawing look smooth
+function dense(p: Path): Path {
+  const out: Path = [p[0]];
+  for (let i = 1; i < p.length; i++) {
+    const d = Math.hypot(p[i][0] - p[i - 1][0], p[i][1] - p[i - 1][1]);
+    const n = Math.max(1, Math.ceil(d / 2.5));
+    for (let k = 1; k <= n; k++) {
+      out.push([
+        p[i - 1][0] + ((p[i][0] - p[i - 1][0]) * k) / n,
+        p[i - 1][1] + ((p[i][1] - p[i - 1][1]) * k) / n,
+      ]);
+    }
+  }
   return out;
 }
 
-function wobble(pts: [number, number][], amp: number): [number, number][] {
-  const phX = rand(0, Math.PI * 2);
-  const phY = rand(0, Math.PI * 2);
-  const frq = rand(0.4, 0.9);
-  return pts.map(([x, y], i) => [
-    x + amp * Math.sin(frq * i + phX),
-    y + amp * Math.sin(frq * i * 1.3 + phY),
-  ]);
+function wobble(p: Path): Path {
+  const a = rnd(0, TAU);
+  const b = rnd(0, TAU);
+  return p.map(([x, y], i) => [x + 0.45 * Math.sin(i * 0.35 + a), y + 0.45 * Math.sin(i * 0.29 + b)]);
 }
 
-function preparePaths(rawPaths: [number, number][][]): [number, number][][] {
-  return rawPaths.map(p => wobble(resample(p, CFG.resampleStep), CFG.wobbleAmp));
+function prepare(paths: Path[]): Prepared[] {
+  return paths.map((raw) => {
+    const pts = wobble(dense(raw));
+    const cum = [0];
+    let total = 0;
+    for (let i = 1; i < pts.length; i++) {
+      total += Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]);
+      cum.push(total);
+    }
+    return { pts, cum, total };
+  });
 }
 
-// ─── Leaf helpers ─────────────────────────────────────────────────────────────
-// All leaves: base at origin, tip along +x, symmetric around x-axis
-function leafRound(len: number): [number, number][] {
-  const w = len * 0.55;
-  const pts: [number, number][] = [];
-  const n = 20;
-  // upper arc
-  for (let i = 0; i <= n; i++) {
-    const t = i / n;
-    pts.push([t * len, -w * Math.sin(Math.PI * t)]);
+// strokes the first `f` (0..1) of a path and returns the pen tip
+function strokePartial(ctx: CanvasRenderingContext2D, s: Prepared, f: number): Pt {
+  const target = s.total * f;
+  let tip = s.pts[0];
+  ctx.beginPath();
+  ctx.moveTo(s.pts[0][0], s.pts[0][1]);
+  for (let i = 1; i < s.pts.length; i++) {
+    if (s.cum[i] <= target) {
+      ctx.lineTo(s.pts[i][0], s.pts[i][1]);
+      tip = s.pts[i];
+    } else {
+      const k = (target - s.cum[i - 1]) / (s.cum[i] - s.cum[i - 1] || 1);
+      tip = [
+        s.pts[i - 1][0] + (s.pts[i][0] - s.pts[i - 1][0]) * k,
+        s.pts[i - 1][1] + (s.pts[i][1] - s.pts[i - 1][1]) * k,
+      ];
+      ctx.lineTo(tip[0], tip[1]);
+      break;
+    }
   }
-  // lower arc
-  for (let i = n; i >= 0; i--) {
-    const t = i / n;
-    pts.push([t * len, w * Math.sin(Math.PI * t)]);
-  }
-  pts.push(pts[0]);
-  return pts;
+  ctx.stroke();
+  return tip;
 }
 
-function leafLens(len: number): [number, number][] {
-  const w = len * 0.38;
-  const pts: [number, number][] = [];
-  const n = 20;
-  for (let i = 0; i <= n; i++) {
-    const t = i / n;
-    pts.push([t * len, -w * Math.sin(Math.PI * t)]);
-  }
-  for (let i = n; i >= 0; i--) {
-    const t = i / n;
-    pts.push([t * len, w * Math.sin(Math.PI * t)]);
-  }
-  pts.push(pts[0]);
-  return pts;
-}
+/* ---------- the component ---------- */
 
-function leafTeardrop(len: number): [number, number][] {
-  const w = len * 0.45;
-  const pts: [number, number][] = [];
-  const n = 24;
-  for (let i = 0; i <= n; i++) {
-    const t = i / n; // 0..1 = base..tip
-    const bulge = Math.sin(Math.PI * t) * (1 - 0.5 * t);
-    pts.push([t * len, -w * bulge]);
-  }
-  for (let i = n; i >= 0; i--) {
-    const t = i / n;
-    const bulge = Math.sin(Math.PI * t) * (1 - 0.5 * t);
-    pts.push([t * len, w * bulge]);
-  }
-  pts.push(pts[0]);
-  return pts;
-}
-
-// Place a leaf: rotate by angle (from +y axis = "up"), translate tip base to (bx, by)
-function placedLeaf(
-  leafFn: (len: number) => [number, number][],
-  len: number,
-  bx: number, by: number,  // attachment point
-  angleDeg: number          // 0 = right, 90 = up, etc.
-): [number, number][] {
-  const a = (angleDeg * Math.PI) / 180;
-  return transPts(rotPts(leafFn(len), -a + Math.PI / 2), bx, by);
-}
-
-// ─── Pot generators (origin = middle of rim, +y = down) ──────────────────────
-function potBowl(w: number, h: number): [number, number][][] {
-  // rim line + bowl half-circle
-  const rim: [number, number][] = [[-w / 2, 0], [w / 2, 0]];
-  const bowl: [number, number][] = [];
-  const n = 20;
-  for (let i = 0; i <= n; i++) {
-    const a = Math.PI * (i / n); // 0..π
-    bowl.push([(w / 2) * Math.cos(Math.PI - a), (h * 0.9) * Math.sin(a)]);
-  }
-  return [rim, bowl];
-}
-
-function potTrap(w: number, h: number): [number, number][][] {
-  const tw = w;         // top width
-  const bw = w * 0.68; // bottom width
-  const path: [number, number][] = [
-    [-tw / 2, 0], [tw / 2, 0], [bw / 2, h], [-bw / 2, h], [-tw / 2, 0],
-  ];
-  return [path];
-}
-
-function potBox(w: number, h: number): [number, number][][] {
-  const path: [number, number][] = [
-    [-w / 2, 0], [w / 2, 0], [w / 2, h], [-w / 2, h], [-w / 2, 0],
-  ];
-  return [path];
-}
-
-const potFns = [potBowl, potTrap, potBox];
-
-// ─── Plant top generators ─────────────────────────────────────────────────────
-// All paths are in local coords, origin = middle of pot rim, up = -y
-
-function plantSprout(h: number): [number, number][][] {
-  const stemH = h * 0.5;
-  const leafLen = h * 0.35;
-  const stem: [number, number][] = [[rand(-3, 3), 0], [rand(-4, 4), -stemH]];
-  const tipX = stem[stem.length - 1][0];
-  const tipY = stem[stem.length - 1][1];
-  const lLeft = placedLeaf(leafRound, leafLen, tipX, tipY, 135);
-  const lRight = placedLeaf(leafRound, leafLen, tipX, tipY, 45);
-  return [stem, lLeft, lRight];
-}
-
-function plantOval(h: number): [number, number][][] {
-  const stemH = h * 0.72;
-  const leafLen = h * 0.28;
-  const stem: [number, number][] = [[0, 0], [0, -stemH]];
-  const paths: [number, number][][] = [stem];
-  const n = 3;
-  for (let i = 0; i < n; i++) {
-    const t = (i + 1) / (n + 0.5);
-    const sy = -stemH * t;
-    const sx = 0;
-    const isLast = i === n - 1;
-    const angle = isLast ? 90 : i % 2 === 0 ? 160 : 20;
-    paths.push(placedLeaf(leafLens, leafLen, sx, sy, angle));
-  }
-  return paths;
-}
-
-function plantTulip(h: number): [number, number][][] {
-  const stemH = h * 0.6;
-  const bw = h * 0.22; // bud half-width
-  const bh = h * 0.32;
-  const stem: [number, number][] = [[0, 0], [0, -stemH]];
-  const tx = 0, ty = -stemH;
-  // tulip cup outline
-  const bud: [number, number][] = [
-    [-bw, ty],
-    [-bw * 0.4, ty - bh * 0.5],
-    [0, ty - bh],         // centre petal tip
-    [bw * 0.4, ty - bh * 0.5],
-    [bw, ty],
-    [bw * 0.6, ty - bh * 0.3], // inner curve
-    [0, ty - bh * 0.55],
-    [-bw * 0.6, ty - bh * 0.3],
-    [-bw, ty],
-  ];
-  // small leaf on stem
-  const lx = 0, ly = -stemH * 0.4;
-  const leaf = placedLeaf(leafLens, h * 0.22, lx, ly, 155);
-  return [stem, bud, leaf];
-}
-
-function plantSucculent(h: number): [number, number][][] {
-  const ll = h * 0.42;
-  const paths: [number, number][][] = [];
-  const angles = [90, 150, 30, 60, 120];
-  const lens = [ll, ll * 0.78, ll * 0.78, ll * 0.6, ll * 0.6];
-  for (let i = 0; i < angles.length; i++) {
-    paths.push(placedLeaf(leafLens, lens[i], 0, 0, angles[i]));
-  }
-  return paths;
-}
-
-function plantGrass(h: number): [number, number][][] {
-  const paths: [number, number][][] = [];
-  const heights = [h * 0.9, h * 0.65, h * 0.75];
-  const xs = [-h * 0.1, 0, h * 0.1];
-  const leans = [-12, 5, 18];
-  for (let i = 0; i < 3; i++) {
-    const stemH = heights[i];
-    const leanRad = (leans[i] * Math.PI) / 180;
-    const blade: [number, number][] = [
-      [xs[i], 0],
-      [xs[i] + stemH * 0.15 * Math.sin(leanRad), -stemH * 0.5],
-      [xs[i] + stemH * Math.sin(leanRad) * 0.5, -stemH],
-    ];
-    paths.push(blade);
-  }
-  return paths;
-}
-
-function plantTeardrop(h: number): [number, number][][] {
-  const stemH = h * 0.42;
-  const branchH = h * 0.26;
-  const ll = h * 0.3;
-  const stem: [number, number][] = [[0, 0], [0, -stemH]];
-  const tx = 0, ty = -stemH;
-  const brL: [number, number][] = [[tx, ty], [tx - branchH * 0.5, ty - branchH]];
-  const brR: [number, number][] = [[tx, ty], [tx + branchH * 0.5, ty - branchH]];
-  const tipL = brL[brL.length - 1];
-  const tipR = brR[brR.length - 1];
-  const leafL = placedLeaf(leafTeardrop, ll, tipL[0], tipL[1], 115);
-  const leafR = placedLeaf(leafTeardrop, ll, tipR[0], tipR[1], 65);
-  return [stem, brL, brR, leafL, leafR];
-}
-
-const plantFns = [
-  plantSprout, plantOval, plantTulip, plantSucculent, plantGrass, plantTeardrop,
-];
-
-// ─── Path length ──────────────────────────────────────────────────────────────
-function pathLength(pts: [number, number][]): number {
-  let len = 0;
-  for (let i = 1; i < pts.length; i++) {
-    len += Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]);
-  }
-  return len;
-}
-
-// ─── Plant instance type ──────────────────────────────────────────────────────
-interface Plant {
-  x: number;
-  y: number;
-  paths: [number, number][][];
-  lengths: number[];
-  tilt: number;        // radians
-  born: number;        // performance.now()
-  phase: 'drawing' | 'holding' | 'fading';
-}
-
-// ─── Component ────────────────────────────────────────────────────────────────
 export default function PlantCanvas() {
+  const pathname = usePathname();
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const plantsRef = useRef<Plant[]>([]);
-  const rafRef = useRef<number>(0);
-  const lastPlantIdx = useRef<number>(-1);
-  const lastPotIdx = useRef<number>(-1);
-  const reducedMotion = useRef(false);
 
   useEffect(() => {
-    if (typeof window === 'undefined') return;
-    reducedMotion.current = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    // Strictly landing page only
+    if (pathname !== "/") return;
 
-    const canvas = canvasRef.current!;
-    const ctx = canvas.getContext('2d')!;
+    const canvas = canvasRef.current;
+    const ctx = canvas?.getContext("2d");
+    if (!canvas || !ctx) return;
 
-    // ── Resize ────────────────────────────────────────────────────────────────
-    function resize() {
-      const dpr = window.devicePixelRatio || 1;
-      canvas.width = window.innerWidth * dpr;
-      canvas.height = window.innerHeight * dpr;
-      canvas.style.width = window.innerWidth + 'px';
-      canvas.style.height = window.innerHeight + 'px';
-      ctx.scale(dpr, dpr);
-    }
-    resize();
-    window.addEventListener('resize', resize);
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    let W = 0;
+    let H = 0;
+    let items: Item[] = [];
+    let lastTop = -1;
+    let raf = 0;
 
-    // ── Draw frame ───────────────────────────────────────────────────────────
-    function drawFrame(now: number) {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const resize = () => {
+      if (!canvas || !ctx) return;
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const rect = canvas.getBoundingClientRect();
+      W = rect.width || window.innerWidth;
+      H = rect.height || window.innerHeight;
+      canvas.width = Math.floor(W * dpr);
+      canvas.height = Math.floor(H * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    };
 
-      for (let pi = plantsRef.current.length - 1; pi >= 0; pi--) {
-        const p = plantsRef.current[pi];
-        const age = now - p.born;
+    const onPointerDown = (e: PointerEvent) => {
+      if (e.button !== 0 && e.pointerType === "mouse") return;
 
-        // phase transitions
-        if (p.phase === 'drawing' && age >= CFG.buildTime) p.phase = 'holding';
-        if (p.phase === 'holding' && age >= CFG.buildTime + CFG.holdTime) p.phase = 'fading';
-        if (p.phase === 'fading' && age >= CFG.buildTime + CFG.holdTime + CFG.fadeTime) {
-          plantsRef.current.splice(pi, 1);
-          continue;
-        }
+      const el = e.target as HTMLElement | null;
+      if (!el) return;
 
-        // global alpha
-        let alpha = 1;
-        if (p.phase === 'fading') {
-          const ft = (age - CFG.buildTime - CFG.holdTime) / CFG.fadeTime;
-          alpha = 1 - clamp(ft, 0, 1);
-        }
+      // ── STRICT GUARD: Must be clicked inside the landing Hero section (#hero) ──
+      if (!el.closest("#hero")) return;
+
+      // Don't trigger if curtain opening is still actively displaying
+      if (typeof window !== "undefined" && window.__OPENING_ACTIVE__) return;
+
+      // Exclude interactive elements
+      if (
+        el.closest(
+          "a, button, nav, header, aside, input, textarea, [data-no-doodle], [data-social-rail], [data-nav-link]"
+        )
+      ) {
+        return;
+      }
+
+      const rect = canvas.getBoundingClientRect();
+      const clickX = e.clientX - rect.left;
+      const clickY = e.clientY - rect.top;
+
+      // Must be within the hero canvas boundaries
+      if (clickX < 0 || clickX > rect.width || clickY < 0 || clickY > rect.height) return;
+
+      const { paths, top } = makePlant(lastTop);
+      lastTop = top;
+      items.push({
+        x: clickX,
+        y: clickY,
+        rot: rnd(-0.12, 0.12),
+        born: performance.now(),
+        paths: prepare(paths),
+      });
+      if (items.length > CONFIG.maxPlants) items.shift();
+    };
+
+    const frame = (now: number) => {
+      ctx.clearRect(0, 0, W, H);
+      const life = CONFIG.buildMs + CONFIG.holdMs + CONFIG.fadeMs;
+      items = items.filter((it) => now - it.born < life);
+
+      for (const it of items) {
+        const age = now - it.born;
+        const progress = reduceMotion ? 1 : Math.min(1, age / CONFIG.buildMs);
+        const alpha =
+          age > CONFIG.buildMs + CONFIG.holdMs
+            ? 1 - (age - CONFIG.buildMs - CONFIG.holdMs) / CONFIG.fadeMs
+            : 1;
 
         ctx.save();
         ctx.globalAlpha = alpha;
-        ctx.translate(p.x, p.y);
-        ctx.rotate(p.tilt);
-        ctx.strokeStyle = CFG.strokeColor;
-        ctx.lineWidth = CFG.lineWidth;
-        ctx.lineCap = 'round';
-        ctx.lineJoin = 'round';
+        ctx.translate(it.x, it.y);
+        ctx.rotate(it.rot);
+        ctx.lineWidth = CONFIG.lineWidth;
+        ctx.lineCap = "round";
+        ctx.lineJoin = "round";
+        ctx.strokeStyle = `rgb(${CONFIG.ink})`;
 
-        const totalPaths = p.paths.length;
-        const totalLen = p.lengths.reduce((a, b) => a + b, 0);
-        const stagger = CFG.staggerFrac * CFG.buildTime;
-        // each path starts at: (pathIdx / totalPaths) * (buildTime - stagger * totalPaths) offset
-        // actually distribute so last path ends exactly at buildTime
-        const totalBuild = reducedMotion.current ? 0 : CFG.buildTime;
-        let dotX = 0, dotY = 0, dotVisible = false;
+        // paths are drawn one after another, with a small overlap
+        const n = it.paths.length;
+        const gap = n > 1 ? 0.6 / n : 0;
+        const span = 1 - (n - 1) * gap;
+        const e = easeInOut(progress);
+        let tip: Pt | null = null;
 
-        for (let i = 0; i < totalPaths; i++) {
-          const pts = p.paths[i];
-          if (pts.length < 2) continue;
+        it.paths.forEach((s, k) => {
+          const f = Math.max(0, Math.min(1, (e - k * gap) / span));
+          if (f <= 0) return;
+          const t = strokePartial(ctx, s, f);
+          if (f < 1) tip = t;
+        });
 
-          const pathStartTime = i * (totalBuild / (totalPaths + 0.5));
-          const pathEndTime = pathStartTime + totalBuild * 0.6;
-          const pathAge = age - pathStartTime;
-          const pathT = reducedMotion.current ? 1 : clamp(pathAge / (pathEndTime - pathStartTime), 0, 1);
-          const easedT = easeInOut(pathT);
-
-          if (pathAge < 0) continue; // not started yet
-
-          // how many points to draw
-          const targetLen = p.lengths[i] * easedT;
-          let drawn = 0;
+        if (tip && progress < 1) {
+          ctx.fillStyle = `rgb(${CONFIG.pen})`;
           ctx.beginPath();
-          ctx.moveTo(pts[0][0], pts[0][1]);
-          let lx = pts[0][0], ly = pts[0][1];
-          for (let j = 1; j < pts.length; j++) {
-            const seg = Math.hypot(pts[j][0] - lx, pts[j][1] - ly);
-            if (drawn + seg > targetLen) {
-              const rem = targetLen - drawn;
-              const frac = seg > 0 ? rem / seg : 0;
-              const nx = lerp(lx, pts[j][0], frac);
-              const ny = lerp(ly, pts[j][1], frac);
-              ctx.lineTo(nx, ny);
-              dotX = nx; dotY = ny;
-              break;
-            }
-            ctx.lineTo(pts[j][0], pts[j][1]);
-            lx = pts[j][0]; ly = pts[j][1];
-            drawn += seg;
-            if (j === pts.length - 1) {
-              dotX = pts[j][0]; dotY = pts[j][1];
-            }
-          }
-          ctx.stroke();
-
-          // dot rides the tip of the LAST in-progress path
-          if (pathT < 1 && p.phase === 'drawing') {
-            dotVisible = true;
-          }
-        }
-
-        // draw dot
-        if (dotVisible) {
-          ctx.beginPath();
-          ctx.arc(dotX, dotY, CFG.dotRadius, 0, Math.PI * 2);
-          ctx.fillStyle = CFG.dotColor;
+          ctx.arc(tip[0], tip[1], 2, 0, TAU);
           ctx.fill();
         }
-
         ctx.restore();
       }
+      raf = requestAnimationFrame(frame);
+    };
 
-      rafRef.current = requestAnimationFrame(drawFrame);
-    }
+    resize();
+    const ro = new ResizeObserver(() => resize());
+    ro.observe(canvas);
 
-    rafRef.current = requestAnimationFrame(drawFrame);
-
-    // ── Click handler ─────────────────────────────────────────────────────────
-    function handlePointer(e: PointerEvent) {
-      // ignore interactive elements
-      const target = e.target as Element | null;
-      if (!target) return;
-      if (target.closest('a, button, nav, [data-nav-link], [data-social-rail]')) return;
-      if (target.closest('header')) return;
-
-      // pick plant & pot (never repeat consecutively)
-      let pIdx: number;
-      do { pIdx = Math.floor(Math.random() * plantFns.length); }
-      while (pIdx === lastPlantIdx.current && plantFns.length > 1);
-      lastPlantIdx.current = pIdx;
-
-      let potIdx: number;
-      do { potIdx = Math.floor(Math.random() * potFns.length); }
-      while (potIdx === lastPotIdx.current && potFns.length > 1);
-      lastPotIdx.current = potIdx;
-
-      const totalH = rand(CFG.plantMinH, CFG.plantMaxH);
-      const potH = totalH * 0.32;
-      const potW = totalH * 0.38;
-      const plantH = totalH * 0.68;
-
-      const potPaths = potFns[potIdx](potW, potH);
-      const plantPaths = plantFns[pIdx](plantH);
-
-      const rawPaths = [...potPaths, ...plantPaths];
-      const paths = preparePaths(rawPaths);
-      const lengths = paths.map(pathLength);
-
-      const tilt = (rand(-CFG.tiltRange, CFG.tiltRange) * Math.PI) / 180;
-      // shift click point to sit at ~40% from top of plant (near pot rim)
-      const offsetY = -totalH * 0.1;
-
-      const plant: Plant = {
-        x: e.clientX,
-        y: e.clientY + offsetY,
-        paths,
-        lengths,
-        tilt,
-        born: performance.now(),
-        phase: 'drawing',
-      };
-
-      // cap at max plants
-      if (plantsRef.current.length >= CFG.maxPlants) {
-        plantsRef.current.shift();
-      }
-      plantsRef.current.push(plant);
-    }
-
-    window.addEventListener('pointerdown', handlePointer);
+    window.addEventListener("resize", resize);
+    window.addEventListener("pointerdown", onPointerDown);
+    raf = requestAnimationFrame(frame);
 
     return () => {
-      window.removeEventListener('resize', resize);
-      window.removeEventListener('pointerdown', handlePointer);
-      cancelAnimationFrame(rafRef.current);
+      cancelAnimationFrame(raf);
+      ro.disconnect();
+      window.removeEventListener("resize", resize);
+      window.removeEventListener("pointerdown", onPointerDown);
     };
-  }, []);
+  }, [pathname]);
+
+  if (pathname !== "/") return null;
 
   return (
     <canvas
       ref={canvasRef}
-      style={{
-        position: 'fixed',
-        inset: 0,
-        pointerEvents: 'none',
-        zIndex: 5,  // above background (ThreeBackground is likely z-0), below nav
-      }}
       aria-hidden="true"
+      style={{
+        position: "absolute",
+        inset: 0,
+        width: "100%",
+        height: "100%",
+        pointerEvents: "none",
+        zIndex: 30,
+      }}
     />
   );
 }

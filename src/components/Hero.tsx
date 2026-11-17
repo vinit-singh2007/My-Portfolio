@@ -6,6 +6,7 @@ import { ArrowUp, ArrowDown, ArrowRight } from 'lucide-react';
 import ThreeBackground from './ThreeBackground';
 import SocialRail from './SocialRail';
 import SoundToggle from './SoundToggle';
+import PlantCanvas from './PlantCanvas';
 import { onOpeningReveal } from '@/lib/openingState';
 import dynamic from 'next/dynamic';
 
@@ -139,6 +140,9 @@ export default function Hero() {
 
       {/* Spacer for fixed top navbar */}
       <div className="w-full h-12 sm:h-20 pointer-events-none shrink-0" />
+
+      {/* ── Click-to-draw Plant Canvas Overlay (Landing Hero Screen Only) ── */}
+      <PlantCanvas />
 
       {/* ── Main Landing Content (Exact Layout from Video Reference) ── */}
       <div className="relative z-10 w-full max-w-7xl mx-auto px-5 sm:px-12 lg:px-20 py-2 sm:py-16 md:py-24 flex-1 flex flex-col justify-center">

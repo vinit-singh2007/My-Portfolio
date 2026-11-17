@@ -18,6 +18,7 @@ function SoundToggleComponent() {
   return (
     <button
       type="button"
+      suppressHydrationWarning
       onClick={() => toggleSoundMuted()}
       aria-label={muted ? 'Enable sound' : 'Mute sound'}
       title={muted ? 'Enable sound' : 'Mute sound'}

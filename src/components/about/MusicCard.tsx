@@ -28,8 +28,8 @@ export const SONGS: SongDefinition[] = [
   { artist: 'Sidhu Moose Wala', title: '295' },
   { artist: 'Travis Scott', title: 'FE!N' },
   { artist: 'Shubh', title: 'We Rollin' },
-  { artist: 'The Neighbourhood', title: 'Sweater Weather' },
-  { artist: 'The Weeknd', title: 'After Hours' },
+  { artist: 'Imagine Dragons', title: 'Believer' },
+  { artist: 'The Weeknd', title: 'Popular' },
   // [MORE SONGS I WILL ADD HERE]
 ];
 

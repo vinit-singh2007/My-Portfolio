@@ -113,7 +113,12 @@ export default function SocialRail() {
       : '';
 
   return (
-    <aside className={`${styles.rail} ${stateClass}`} aria-label="Social links">
+    <aside
+      data-no-doodle="true"
+      data-social-rail="true"
+      className={`${styles.rail} ${stateClass}`}
+      aria-label="Social links"
+    >
       {/* 1. TOP LINE: 1px wide, flex: 1, gradient transparent -> line color */}
       <div className={styles.topLine} aria-hidden="true" />
 
