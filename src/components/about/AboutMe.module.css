@@ -403,7 +403,7 @@
   top: 15cqw;
   right: 8.1cqw;
   width: 1.8cqw;
-  height: 42cqw;
+  height: 43cqw;
   transform-origin: 0.9cqw 0px;
   transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
   background: linear-gradient(to right, #71717a, #f4f4f5 40%, #a1a1aa 60%, #52525b);
@@ -443,7 +443,7 @@
 }
 
 .armPlaying {
-  transform: rotate(26deg);
+  transform: rotate(34deg);
 }
 
 /* ── Track Text (Right Half, above buttons) ── */
