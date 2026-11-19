@@ -1,19 +1,19 @@
 /* ── Theme Tokens for Social Rail ── */
-:root {
+.rail {
   --rail-line-color: #46464a;
   --rail-surface-color: #17171a;
   --rail-border-color: #2e2e32;
   --rail-icon-color: #d4d4d8;
 }
 
-:global(.dark) {
+:global(.dark) .rail {
   --rail-line-color: #46464a;
   --rail-surface-color: #17171a;
   --rail-border-color: #2e2e32;
   --rail-icon-color: #d4d4d8;
 }
 
-:global(.light) {
+:global(.light) .rail {
   --rail-line-color: #bdb9b0;
   --rail-surface-color: #ffffff;
   --rail-border-color: #d8d4cb;

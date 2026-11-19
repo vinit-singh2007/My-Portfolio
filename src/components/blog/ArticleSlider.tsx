@@ -69,7 +69,7 @@ export default function ArticleSlider({
   }, [drag, idx, dx, w, n, go]);
 
   return (
-    <div className="fixed inset-0 z-[120] flex items-center justify-center overflow-hidden">
+    <div className="fixed inset-0 z-[120] flex items-center justify-center overflow-hidden bg-[#0A0A0A]">
       {onClose ? (
         <button
           onClick={onClose}
@@ -88,9 +88,10 @@ export default function ArticleSlider({
         id="bg"
         style={{
           backgroundImage: bg ? `url(${bg})` : "none",
-          backgroundColor: banner ? "#2b0615" : undefined,
+          backgroundColor: banner ? "#2b0615" : "#0A0A0A",
         }}
       />
+      <div className="absolute inset-0 bg-black/40 z-[2] pointer-events-none" />
       {banner && <Glow />}
 
       <div
