@@ -333,6 +333,49 @@ export default function PlantCanvas() {
       // Must be within the hero canvas boundaries
       if (clickX < 0 || clickX > rect.width || clickY < 0 || clickY > rect.height) return;
 
+      // ── SCROLL GUARD: For touch, only draw on intentional taps, not scroll gestures ──
+      // Track finger movement; cancel if finger drifts more than 8px (scroll intent).
+      if (e.pointerType === "touch") {
+        const startX = e.clientX;
+        const startY = e.clientY;
+        const MOVE_THRESHOLD = 8;
+        let didScroll = false;
+
+        const onMove = (me: PointerEvent) => {
+          const dx = me.clientX - startX;
+          const dy = me.clientY - startY;
+          if (Math.sqrt(dx * dx + dy * dy) > MOVE_THRESHOLD) {
+            didScroll = true;
+          }
+        };
+
+        const onUp = () => {
+          window.removeEventListener("pointermove", onMove);
+          window.removeEventListener("pointerup", onUp);
+          window.removeEventListener("pointercancel", onUp);
+
+          if (didScroll) return; // was a scroll — skip drawing
+
+          // Intentional tap: draw the doodle
+          const { paths, idx } = makeDoodle(lastIdx);
+          lastIdx = idx;
+          items.push({
+            x: clickX,
+            y: clickY,
+            rot: rnd(-CONFIG.rotRange, CONFIG.rotRange),
+            born: performance.now(),
+            paths: prep(paths),
+          });
+          if (items.length > CONFIG.maxItems) items.shift();
+        };
+
+        window.addEventListener("pointermove", onMove, { passive: true });
+        window.addEventListener("pointerup", onUp, { once: true });
+        window.addEventListener("pointercancel", onUp, { once: true });
+        return; // drawing happens inside onUp for touch
+      }
+
+      // ── Mouse / stylus: draw immediately as before ──
       const { paths, idx } = makeDoodle(lastIdx);
       lastIdx = idx;
 
