@@ -969,11 +969,19 @@
 }
 
 @media (max-width: 768px) {
-
-  .cardMusic,
+  .cardProfile,
   .cardPhotos,
   .cardBlog {
     display: none !important;
+  }
+
+  .cardMusic {
+    display: block !important;
+    grid-column: 1 / -1;
+    grid-row: auto;
+    width: 100%;
+    max-width: 440px;
+    justify-self: center;
   }
 }
 
@@ -991,7 +999,7 @@
     padding: 22px;
   }
 
-  .cardProfile,
+  .cardMusic,
   .cardGithub {
     grid-column: 1;
   }

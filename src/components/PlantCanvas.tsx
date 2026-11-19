@@ -317,10 +317,10 @@ export default function PlantCanvas() {
       // Don't trigger if curtain opening is still actively displaying
       if (typeof window !== "undefined" && window.__OPENING_ACTIVE__) return;
 
-      // Exclude clicks on interactive links, buttons, nav, rail, etc.
+      // Exclude clicks on interactive links, buttons, nav, rail, bug, etc.
       if (
         el.closest(
-          "a, button, nav, header, aside, input, textarea, [data-no-doodle], [data-social-rail], [data-nav-link]"
+          "a, button, nav, header, aside, input, textarea, [data-no-doodle], [data-social-rail], [data-nav-link], [data-hanging-bug], .bug-fixed-root, .bug-wrapper, .bug-pendulum-arm"
         )
       ) {
         return;

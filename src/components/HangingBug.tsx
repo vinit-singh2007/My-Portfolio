@@ -181,29 +181,33 @@ export default function HangingBug() {
 
       {/* Fixed container anchored to top-left */}
       <div
+        data-no-doodle="true"
+        data-hanging-bug="true"
         className="bug-fixed-root fixed z-[9999] pointer-events-none select-none"
         aria-hidden="true"
       >
-        <div className="bug-wrapper flex flex-col items-center">
+        <div className="bug-wrapper flex flex-col items-center" data-no-doodle="true">
           {/* Pendulum arm pivoting from top center (ceiling) */}
           <div
             key={swingState === 'swinging' ? `swing-${swingKey}` : swingState}
-            className={`bug-pendulum-arm flex flex-col items-center ${
-              swingState === 'swinging'
+            data-no-doodle="true"
+            className={`bug-pendulum-arm flex flex-col items-center ${swingState === 'swinging'
                 ? 'is-swinging'
                 : swingState === 'settling'
-                ? 'is-settling'
-                : swingState === 'idle'
-                ? 'is-idle'
-                : 'is-intro'
-            }`}
+                  ? 'is-settling'
+                  : swingState === 'idle'
+                    ? 'is-idle'
+                    : 'is-intro'
+              }`}
             onAnimationEnd={handleAnimationEnd}
           >
             {/* Silk thread dangling from top */}
-            <div className="w-px bg-zinc-400/60" style={{ height: '72px' }} />
+            <div className="w-px bg-zinc-400/60" style={{ height: '72px' }} data-no-doodle="true" />
 
             {/* Interactive Bug with generous hitbox */}
             <div
+              data-no-doodle="true"
+              data-hanging-bug="true"
               className="pointer-events-auto cursor-pointer relative flex items-center justify-center transition-transform active:scale-95"
               style={{
                 padding: '14px 22px',
@@ -211,8 +215,9 @@ export default function HangingBug() {
               }}
               onMouseEnter={handleMouseEnter}
               onMouseLeave={handleMouseLeave}
+              onPointerDown={(e) => e.stopPropagation()}
               onClick={handleClick}
-              title="Poke me!"
+            // title="Poke me!"
             >
               <svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <ellipse cx="22" cy="26" rx="12" ry="14" fill="#1a1a1a" stroke="#e5e5e5" strokeWidth="1.2" />
@@ -230,9 +235,9 @@ export default function HangingBug() {
                 <circle cx="14.5" cy="1.5" r="1.2" fill="#e5e5e5" />
                 <line x1="25" y1="7" x2="29" y2="2" stroke="#e5e5e5" strokeWidth="1.2" strokeLinecap="round" />
                 <circle cx="29.5" cy="1.5" r="1.2" fill="#e5e5e5" />
-                <line x1="10" y1="20" x2="6"  y2="17" stroke="#e5e5e5" strokeWidth="1" strokeLinecap="round" />
-                <line x1="10" y1="25" x2="5"  y2="25" stroke="#e5e5e5" strokeWidth="1" strokeLinecap="round" />
-                <line x1="10" y1="30" x2="6"  y2="34" stroke="#e5e5e5" strokeWidth="1" strokeLinecap="round" />
+                <line x1="10" y1="20" x2="6" y2="17" stroke="#e5e5e5" strokeWidth="1" strokeLinecap="round" />
+                <line x1="10" y1="25" x2="5" y2="25" stroke="#e5e5e5" strokeWidth="1" strokeLinecap="round" />
+                <line x1="10" y1="30" x2="6" y2="34" stroke="#e5e5e5" strokeWidth="1" strokeLinecap="round" />
                 <line x1="34" y1="20" x2="38" y2="17" stroke="#e5e5e5" strokeWidth="1" strokeLinecap="round" />
                 <line x1="34" y1="25" x2="39" y2="25" stroke="#e5e5e5" strokeWidth="1" strokeLinecap="round" />
                 <line x1="34" y1="30" x2="38" y2="34" stroke="#e5e5e5" strokeWidth="1" strokeLinecap="round" />
