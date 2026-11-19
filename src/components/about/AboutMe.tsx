@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import styles from './AboutMe.module.css';
 import MusicCard, { SONGS } from './MusicCard';
 
@@ -12,28 +13,44 @@ export const BLOG_URL = 'https://github.com/vinit-singh2007';
 export const GITHUB_USERNAME = 'vinit-singh2007';
 
 /**
- * Latest build card — update this whenever you ship something new.
+ * Latest build / featured article card — update this whenever you ship something new.
  * `tag` is a small label shown above the title (e.g. "Project", "Blog", "Side build").
  */
 export const LATEST_BUILD = {
-  tag: 'Project',
-  title: 'Day 0',
+  tag: 'Blog',
+  title: 'Sitting on the edge of Kaldurg',
   description:
-    'A career simulation platform that helps students and freshers experience real work before their first job.',
-  url: 'https://day-0-delta.vercel.app/',
+    'A morning on the hill fort that keeps watch over Palghar, and why I came down quieter than I went up.',
+  url: '/blog/kaldurg-fort',
 };
 
 /**
- * Array of food image paths in /images/food/ (e.g. ['/images/food/food-1.jpg', ...]).
- * If empty, the Photos card displays a clean neutral gradient with zero text.
+ * Array of cinema / film stills from @t4iv3 ("Once-in-a-lifetime films collection")
+ * Stored locally in /images/cinema/ for instantaneous loading.
  */
-export const FOOD_IMAGES: string[] = [
-  'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=700&q=85&auto=format&fit=crop',
-  'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=700&q=85&auto=format&fit=crop',
-  'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=700&q=85&auto=format&fit=crop',
-  'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=700&q=85&auto=format&fit=crop',
-  'https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=700&q=85&auto=format&fit=crop',
+export const CINEMA_IMAGES: string[] = [
+  '/images/cinema/movie-1.jpg',
+  '/images/cinema/movie-2.jpg',
+  '/images/cinema/movie-3.jpg',
+  '/images/cinema/movie-4.jpg',
+  '/images/cinema/movie-5.jpg',
+  '/images/cinema/movie-6.jpg',
+  '/images/cinema/movie-7.jpg',
+  '/images/cinema/movie-8.jpg',
+  '/images/cinema/movie-9.jpg',
+  '/images/cinema/movie-10.jpg',
+  '/images/cinema/movie-11.jpg',
+  '/images/cinema/movie-12.jpg',
+  '/images/cinema/movie-13.jpg',
+  '/images/cinema/movie-14.jpg',
+  '/images/cinema/movie-15.jpg',
+  '/images/cinema/movie-16.jpg',
+  '/images/cinema/movie-17.jpg',
+  '/images/cinema/movie-18.jpg',
+  '/images/cinema/movie-19.jpg',
+  '/images/cinema/movie-20.jpg',
 ];
+export const FOOD_IMAGES = CINEMA_IMAGES;
 
 /**
  * Books hobby slideshow — Open Library cover CDN URLs.
@@ -289,7 +306,7 @@ export default function AboutMe() {
                 <p className={styles.sectionText}>
                   I&apos;m most at home in a hackathon, where a team, a deadline and a half-formed
                   idea turn into a working product overnight. I enter them often, and it&apos;s
-                  where I learn fastest. Away from the screen, I play cricket and volleyball, and
+                  where I learn fastest. Away from the screen, I play volleyball, and
                   BGMI when I want to switch off. I cook, I travel whenever I get the chance, and
                   music is how I unwind once the code is done.
                 </p>
@@ -373,20 +390,46 @@ export default function AboutMe() {
         <MusicCard reducedMotion={reducedMotion} />
 
         {/* ══════════════════════════════════════════
-            CARD 4: FOOD PHOTOS — full bleed slideshow
+            CARD 4: CINEMA & FILMS — full bleed slideshow
            ══════════════════════════════════════════ */}
-        <div className={`${styles.cardBase} ${styles.cardPhotos}`} aria-label="Food hobby">
-          {FOOD_IMAGES.map((src, idx) => (
+        <div className={`${styles.cardBase} ${styles.cardPhotos}`} aria-label="Cinema & Films">
+          {CINEMA_IMAGES.map((src, idx) => (
             <div
               key={src}
               className={styles.photoSlide}
               style={{ opacity: idx === photoIndex ? 1 : 0 }}
             >
+              {/* Atmospheric ambient backdrop: fills the entire card with the poster's colors */}
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={src}
-                alt={`Food photo ${idx + 1}`}
-                style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', borderRadius: 'inherit' }}
+                alt=""
+                aria-hidden="true"
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover',
+                  filter: 'blur(20px) brightness(0.45)',
+                  transform: 'scale(1.15)',
+                  display: 'block',
+                }}
+              />
+              {/* Full uncropped film poster */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={src}
+                alt={`Film ${idx + 1}`}
+                style={{
+                  position: 'relative',
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'contain',
+                  display: 'block',
+                  borderRadius: 'inherit',
+                  zIndex: 2,
+                }}
                 loading="eager"
               />
             </div>
@@ -416,16 +459,26 @@ export default function AboutMe() {
           </div>
 
           {/* Title link */}
-          <a
-            href={LATEST_BUILD.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            suppressHydrationWarning
-            className={`${styles.blogLink} ${styles.focusOrange}`}
-          >
-            <span>{LATEST_BUILD.title}</span>
-            <ArrowRightIcon />
-          </a>
+          {LATEST_BUILD.url.startsWith('/') ? (
+            <Link
+              href={LATEST_BUILD.url}
+              className={`${styles.blogLink} ${styles.focusOrange}`}
+            >
+              <span>{LATEST_BUILD.title}</span>
+              <ArrowRightIcon />
+            </Link>
+          ) : (
+            <a
+              href={LATEST_BUILD.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              suppressHydrationWarning
+              className={`${styles.blogLink} ${styles.focusOrange}`}
+            >
+              <span>{LATEST_BUILD.title}</span>
+              <ArrowRightIcon />
+            </a>
+          )}
 
           {/* Description */}
           <p className={styles.blogNote}>
