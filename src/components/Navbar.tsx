@@ -99,7 +99,7 @@ export default function Navbar() {
     const element = document.getElementById(id);
     if (element) {
       const offsetTop =
-        id === 'hero' || id === 'about'
+        id === 'hero' || id === 'home' || id === 'about'
           ? element.offsetTop
           : element.offsetTop - 70;
       window.scrollTo({
@@ -117,7 +117,7 @@ export default function Navbar() {
           'transform 0.38s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.3s ease, border-color 0.3s ease, padding 0.3s ease, backdrop-filter 0.3s ease',
         opacity: introRevealed ? 1 : 0,
       }}
-      className={`fixed top-0 inset-x-0 z-50 w-full px-6 sm:px-12 lg:px-20 flex items-center justify-center ${
+      className={`hidden md:flex fixed top-0 inset-x-0 z-50 w-full px-6 sm:px-12 lg:px-20 items-center justify-center ${
         isAtTop && !mobileMenuOpen
           ? 'py-7 sm:py-8 bg-transparent border-b border-transparent'
           : 'py-4 sm:py-5 bg-[#0a0a0a]/75 backdrop-blur-xl border-b border-white/[0.08] shadow-2xl'

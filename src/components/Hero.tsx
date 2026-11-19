@@ -110,7 +110,7 @@ export default function Hero() {
     const element = document.getElementById(id);
     if (element) {
       const offsetTop =
-        id === 'hero' || id === 'about'
+        id === 'hero' || id === 'home' || id === 'about'
           ? element.offsetTop
           : element.offsetTop - 70;
       window.scrollTo({
@@ -122,10 +122,11 @@ export default function Hero() {
 
   return (
     <section
-      id="hero"
+      id="home"
       className="relative w-full h-full flex flex-col justify-between overflow-hidden select-none bg-[#0A0A0A] text-white"
       style={{ height: '100%', minHeight: '100%' }}
     >
+      <span id="hero" className="sr-only" aria-hidden="true" />
       {/* ── Background: 3D Sculptural Ribbed Ribbon Canvas + Clean Dark Space ── */}
       <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
         {/* Real-time 3D Sculptural Ribbed Ribbon */}
@@ -138,8 +139,8 @@ export default function Hero() {
         <div className="absolute bottom-0 inset-x-0 h-32 bg-gradient-to-t from-[#0A0A0A] to-transparent pointer-events-none" />
       </div>
 
-      {/* Spacer for fixed top navbar */}
-      <div className="w-full h-12 sm:h-20 pointer-events-none shrink-0" />
+      {/* Spacer for fixed top navbar — desktop only (navbar hidden on mobile) */}
+      <div className="w-full h-0 sm:h-20 pointer-events-none shrink-0" />
 
       {/* ── Click-to-draw Plant Canvas Overlay (Landing Hero Screen Only) ── */}
       <PlantCanvas />
@@ -220,8 +221,8 @@ export default function Hero() {
           paddingBottom: 'max(1.25rem, calc(env(safe-area-inset-bottom, 0px) + 0.75rem))',
         }}
       >
-        {/* Bottom-Left: Two Circular Outline Arrow Buttons (Matching Video ( ^ ) ( v )) */}
-        <div className="flex items-center gap-2.5 sm:gap-3 pointer-events-auto">
+        {/* Bottom-Left: Two Circular Outline Arrow Buttons — hidden on mobile */}
+        <div className="hidden sm:flex items-center gap-2.5 sm:gap-3 pointer-events-auto">
           <motion.button
             suppressHydrationWarning
             whileHover={{ scale: 1.08 }}

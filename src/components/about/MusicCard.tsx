@@ -17,19 +17,31 @@ export interface SongDefinition {
   src?: string;
   cover?: string;
   color?: string;
+  startTime?: number;
 }
 
 export const SONGS: SongDefinition[] = [
   { artist: 'The Weeknd', title: 'Starboy' },
-  { artist: 'Shubh', title: 'No Love' },
+  { artist: 'Arctic Monkeys', title: 'I Wanna Be Yours' },
+  {
+    artist: 'Ed Sheeran',
+    title: 'Shape of You',
+    src: '/audio/shape-of-you.mp3',
+    cover:
+      'https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/15/e6/e8/15e6e8a4-4190-6a8b-86c3-ab4a51b88288/190295851286.jpg/600x600bb.jpg',
+    startTime: 0,
+  },
   { artist: 'Karan Aujla', title: 'Winning Speech' },
   { artist: 'Shubh', title: 'Cheques' },
-  { artist: 'Arctic Monkeys', title: 'I Wanna Be Yours' },
+  { artist: 'Imagine Dragons', title: 'Believer' },
   { artist: 'Sidhu Moose Wala', title: '295' },
   { artist: 'Travis Scott', title: 'FE!N' },
   { artist: 'Shubh', title: 'We Rollin' },
-  { artist: 'Imagine Dragons', title: 'Believer' },
   { artist: 'The Weeknd', title: 'Popular' },
+  {
+    artist: 'Dhanda Nyoliwala',
+    title: 'Knife Brows (Remix)',
+  },
   // [MORE SONGS I WILL ADD HERE]
 ];
 
@@ -39,6 +51,7 @@ interface ResolvedSong {
   audioUrl: string;
   coverUrl: string;
   colorHex?: string;
+  startTime?: number;
   h: number;
   s: number;
 }
@@ -244,13 +257,13 @@ async function lookupItunes(
         const aLower = song.artist.toLowerCase();
         const tLower = song.title.toLowerCase();
 
-        // 1. Match both artist and title
+        // 1. Match both artist and title (including featured artist in track name)
         let match = data.results.find((r: any) => {
           if (!r.previewUrl) return false;
           const rArtist = (r.artistName || '').toLowerCase();
           const rTrack = (r.trackName || '').toLowerCase();
           return (
-            (rArtist.includes(aLower) || aLower.includes(rArtist)) &&
+            (rArtist.includes(aLower) || aLower.includes(rArtist) || rTrack.includes(aLower)) &&
             (rTrack.includes(tLower) || tLower.includes(rTrack))
           );
         });
@@ -260,7 +273,8 @@ async function lookupItunes(
           match = data.results.find((r: any) => {
             if (!r.previewUrl) return false;
             const rArtist = (r.artistName || '').toLowerCase();
-            return rArtist.includes(aLower) || aLower.includes(rArtist);
+            const rTrack = (r.trackName || '').toLowerCase();
+            return rArtist.includes(aLower) || aLower.includes(rArtist) || rTrack.includes(aLower);
           });
         }
 
@@ -270,9 +284,14 @@ async function lookupItunes(
         }
 
         if (match && match.previewUrl) {
+          const displayedArtist =
+            match.artistName && match.artistName.toLowerCase().includes(aLower)
+              ? match.artistName
+              : song.artist;
+
           return {
             trackName: match.trackName || song.title,
-            artistName: match.artistName || song.artist,
+            artistName: displayedArtist,
             cover: (match.artworkUrl100 || '').replace('100x100', '600x600'),
             previewUrl: match.previewUrl,
           };
@@ -327,6 +346,7 @@ export default function MusicCard({ reducedMotion = false }: MusicCardProps) {
         audioUrl: songDef.src,
         coverUrl: cover,
         colorHex: songDef.color,
+        startTime: songDef.startTime,
         h: color.h,
         s: color.s,
       };
@@ -354,6 +374,7 @@ export default function MusicCard({ reducedMotion = false }: MusicCardProps) {
         audioUrl: itunesResult.previewUrl,
         coverUrl: itunesResult.cover,
         colorHex: songDef.color,
+        startTime: songDef.startTime,
         h: color.h,
         s: color.s,
       };
@@ -425,6 +446,9 @@ export default function MusicCard({ reducedMotion = false }: MusicCardProps) {
     if (audio.src !== current.audioUrl) {
       audio.src = current.audioUrl;
       audio.load();
+      if (typeof current.startTime === 'number') {
+        audio.currentTime = current.startTime;
+      }
     }
 
     if (pendingPlayOnIndexChange.current || userWantsPlay.current) {
@@ -518,11 +542,42 @@ export default function MusicCard({ reducedMotion = false }: MusicCardProps) {
     }
   }, [currentIndex, goToTrack]);
 
-  const handleAudioError = useCallback(() => {
+  const handleAudioError = useCallback(async () => {
+    const songDef = SONGS[currentIndex];
+    const current = resolvedSongs[currentIndex];
+
+    // If custom local src is missing/failed, fallback gracefully to online preview
+    if (songDef?.src && current?.audioUrl === songDef.src) {
+      const itunesResult = await lookupItunes(songDef);
+      if (itunesResult?.previewUrl && audioRef.current) {
+        const color = await extractDominantColor(itunesResult.cover, songDef.color);
+        const fallbackResolved: ResolvedSong = {
+          artist: songDef.artist,
+          title: songDef.title,
+          audioUrl: itunesResult.previewUrl,
+          coverUrl: itunesResult.cover,
+          colorHex: songDef.color,
+          startTime: songDef.startTime,
+          h: color.h,
+          s: color.s,
+        };
+        setResolvedSongs((prev) => ({ ...prev, [currentIndex]: fallbackResolved }));
+        audioRef.current.src = itunesResult.previewUrl;
+        audioRef.current.load();
+        if (userWantsPlay.current) {
+          audioRef.current
+            .play()
+            .then(() => setIsPlaying(true))
+            .catch(() => setIsPlaying(false));
+        }
+        return;
+      }
+    }
+
     if (userWantsPlay.current) {
       goToTrack(currentIndex + 1, true);
     }
-  }, [currentIndex, goToTrack]);
+  }, [currentIndex, goToTrack, resolvedSongs]);
 
   /* ── 8. Cleanup on Unmount ── */
   useEffect(() => {

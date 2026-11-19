@@ -12,7 +12,7 @@ export default function Footer() {
     const element = document.getElementById(id);
     if (element) {
       const offsetTop =
-        id === 'hero' || id === 'projects'
+        id === 'hero' || id === 'home' || id === 'projects'
           ? element.offsetTop
           : element.offsetTop - 70;
       window.scrollTo({

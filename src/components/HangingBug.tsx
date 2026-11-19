@@ -165,10 +165,10 @@ export default function HangingBug() {
           }
         }
 
-        /* Mobile (<= 768px): positioned cleanly right after the GitHub icon */
+        /* Mobile (<= 768px): anchored top-left, slightly inset */
         .bug-fixed-root {
           top: 0;
-          left: clamp(126px, 34vw, 142px);
+          left: clamp(60px, 14vw, 90px);
         }
 
         /* Desktop (> 768px): anchored in the open top-left area */

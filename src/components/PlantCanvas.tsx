@@ -311,8 +311,8 @@ export default function PlantCanvas() {
       const el = e.target as HTMLElement | null;
       if (!el) return;
 
-      // ── STRICT GUARD: Must be clicked inside the landing Hero section (#hero) ──
-      if (!el.closest("#hero")) return;
+      // ── STRICT GUARD: Must be clicked inside the landing Hero section (#hero or #home) ──
+      if (!el.closest("#hero, #home")) return;
 
       // Don't trigger if curtain opening is still actively displaying
       if (typeof window !== "undefined" && window.__OPENING_ACTIVE__) return;

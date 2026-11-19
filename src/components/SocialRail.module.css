@@ -185,12 +185,12 @@
   }
 }
 
-/* ── Mobile Layout (<= 768px): Strictly Horizontal Row in Upper Left ── */
+/* ── Mobile Layout (<= 768px): Strictly Horizontal Row in Upper Right ── */
 @media (max-width: 768px) {
   .rail {
     position: absolute !important;
-    left: clamp(20px, 5vw, 28px) !important;
-    right: auto !important;
+    right: clamp(20px, 5vw, 28px) !important;
+    left: auto !important;
     top: 28px !important;
     transform: none !important;
     height: auto !important;
