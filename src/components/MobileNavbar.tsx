@@ -91,9 +91,10 @@ export default function MobileNavbar() {
         // offset > 0  → land N px before the section top (more space above)
         // offset < 0  → land N px into the section (skips top padding, heading comes up)
         const OFFSETS: Record<string, number> = {
-          about:   0,    // about slides up naturally
-          blog:    20,   // slight gap
-          contact: -72,  // skip most of py-24 padding so "Let's Connect" is near top
+          about:    0,    // about slides up naturally
+          projects: -24,  // skip pt-8 (32px) so heading is near top
+          blog:     -72,  // skip most of py-24 (96px) so heading is near top
+          contact:  -72,  // skip most of py-24 (96px) so "Let's Connect" is near top
         };
         const offset    = OFFSETS[id] ?? 70;
         const absTop    = el.getBoundingClientRect().top + window.scrollY;
