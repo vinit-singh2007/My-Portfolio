@@ -88,7 +88,14 @@ export default function MobileNavbar() {
 
       const el = document.getElementById(id);
       if (el) {
-        const offset    = id === 'about' ? 0 : 70;
+        // offset > 0  → land N px before the section top (more space above)
+        // offset < 0  → land N px into the section (skips top padding, heading comes up)
+        const OFFSETS: Record<string, number> = {
+          about:   0,    // about slides up naturally
+          blog:    20,   // slight gap
+          contact: -72,  // skip most of py-24 padding so "Let's Connect" is near top
+        };
+        const offset    = OFFSETS[id] ?? 70;
         const absTop    = el.getBoundingClientRect().top + window.scrollY;
         const targetTop = Math.max(0, absTop - offset);
         window.scrollTo({ top: targetTop, behavior });

@@ -261,7 +261,7 @@ export default function Blog() {
   return (
     <section
       id="blog"
-      className="py-24 px-4 sm:px-6 max-w-7xl mx-auto relative select-none scroll-mt-20 overflow-hidden"
+      className="py-24 px-4 sm:px-6 max-w-7xl mx-auto relative select-none scroll-mt-20 scroll-mb-[140px] overflow-hidden"
     >
       {/* ── Section Heading ── */}
       <div className="text-center mb-12 sm:mb-16">
