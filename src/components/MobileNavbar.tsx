@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { usePathname } from 'next/navigation';
 import { Home, User, Briefcase, BookOpen, Mail } from 'lucide-react';
 
 interface NavItem {
@@ -43,6 +44,9 @@ function getActiveSection(): string {
 }
 
 export default function MobileNavbar() {
+  const pathname = usePathname();
+  const isBlog = pathname?.startsWith('/blog') || pathname !== '/';
+
   const [activeId, setActiveId] = useState<string>('home');
   // While this ref holds an id, scroll events keep showing that id
   // (prevents smooth-scroll intermediate positions from overriding a tap)
@@ -50,6 +54,8 @@ export default function MobileNavbar() {
   const lockTimerRef  = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
+    if (isBlog) return;
+
     const onScroll = () => {
       if (scrollLockRef.current !== null) {
         // Keep showing the tapped target while scroll animation runs
@@ -62,7 +68,7 @@ export default function MobileNavbar() {
     window.addEventListener('scroll', onScroll, { passive: true });
     onScroll(); // set immediately on mount
     return () => window.removeEventListener('scroll', onScroll);
-  }, []);
+  }, [isBlog]);
 
   const handleNavClick = useCallback(
     (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
@@ -104,6 +110,10 @@ export default function MobileNavbar() {
     },
     []
   );
+
+  if (isBlog) {
+    return null;
+  }
 
   return (
     <nav

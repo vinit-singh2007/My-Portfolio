@@ -29,7 +29,7 @@ export default function Footer() {
   });
 
   return (
-    <footer className="w-full border-t border-white/[0.08] bg-[#0a0a0a] px-6 sm:px-12 lg:px-20 pt-5 sm:pt-6 pb-5 relative z-10">
+    <footer className="w-full border-t border-white/[0.08] bg-[#0a0a0a] px-6 sm:px-12 lg:px-20 pt-5 sm:pt-6 pb-28 md:pb-5 relative z-10">
       <div className="w-full mx-auto">
         {/* 1. Giant Cursive Wordmark */}
         <motion.div
