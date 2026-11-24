@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import styles from "./kaldurg.module.css";
 import { inter, serif, mono } from "./fonts";
 
@@ -25,8 +26,18 @@ const TIPS = [
 ];
 
 export default function KaldurgBlog() {
+  const router = useRouter();
   const rootRef = useRef<HTMLDivElement>(null);
   const barRef = useRef<HTMLDivElement>(null);
+
+  const handleBack = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (typeof window !== "undefined" && window.history.length > 1) {
+      router.back();
+    } else {
+      router.push("/#blog");
+    }
+  };
 
   useEffect(() => {
     const root = rootRef.current;
@@ -97,7 +108,7 @@ export default function KaldurgBlog() {
       <div className={styles.scrim} aria-hidden="true" />
       <div className={styles.bar} ref={barRef} aria-hidden="true" />
 
-      <Link href={BLOG_URL} className={styles.back}>
+      <Link href={BLOG_URL} onClick={handleBack} className={styles.back}>
         &larr; Blog
       </Link>
 
@@ -229,7 +240,7 @@ export default function KaldurgBlog() {
             a bad trade for a morning.
           </p>
           <div className={styles.end}>
-            <Link href={BLOG_URL}>&larr; Back to all posts</Link>
+            <Link href={BLOG_URL} onClick={handleBack}>&larr; Back to all posts</Link>
           </div>
         </section>
       </article>

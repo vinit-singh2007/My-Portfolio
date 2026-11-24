@@ -68,21 +68,26 @@ export default function ArticleSlider({
     };
   }, [drag, idx, dx, w, n, go]);
 
+  const handleBack = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (onClose) {
+      onClose();
+    } else if (typeof window !== "undefined" && window.history.length > 1) {
+      window.history.back();
+    } else {
+      window.location.href = "/#blog";
+    }
+  };
+
   return (
     <div className="fixed inset-0 z-[120] flex items-center justify-center overflow-hidden bg-[#0A0A0A]">
-      {onClose ? (
-        <button
-          onClick={onClose}
-          className="blog-back-pill"
-          aria-label="Back to blog"
-        >
-          &larr; Blog
-        </button>
-      ) : (
-        <Link href="/#blog" className="blog-back-pill" aria-label="Back to blog">
-          &larr; Blog
-        </Link>
-      )}
+      <button
+        onClick={handleBack}
+        className="blog-back-pill"
+        aria-label="Back to blog"
+      >
+        &larr; Blog
+      </button>
 
       <div
         id="bg"
@@ -110,20 +115,14 @@ export default function ArticleSlider({
           <article className="glass">
             <div className="mark"><Wave /></div>
             <div className="bar">
-              {onClose ? (
-                <button
-                  type="button"
-                  onClick={onClose}
-                  className="back bg-transparent border-0 p-0 text-inherit cursor-pointer flex items-center gap-2"
-                  aria-label="Back to blog"
-                >
-                  <ArrowLeft />Blog
-                </button>
-              ) : (
-                <Link className="back" href="/#blog" aria-label="Back to blog">
-                  <ArrowLeft />Blog
-                </Link>
-              )}
+              <button
+                type="button"
+                onClick={handleBack}
+                className="back bg-transparent border-0 p-0 text-inherit cursor-pointer flex items-center gap-2"
+                aria-label="Back to blog"
+              >
+                <ArrowLeft />Blog
+              </button>
               <div className="flex items-center gap-3">
                 <span className="count">{idx + 1} / {n}</span>
                 {onClose && (

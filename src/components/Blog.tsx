@@ -232,6 +232,13 @@ export default function Blog() {
   const [activeArticle, setActiveArticle] = useState<Article | null>(null);
   const shouldReduceMotion = useReducedMotion();
 
+  // Clean up URL hash so that if the user arrives at /#blog, the hash is stripped from the URL bar
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.location.hash === '#blog') {
+      window.history.replaceState(null, '', window.location.pathname);
+    }
+  }, []);
+
   // Close modal on Escape key & arrow navigation & manage body scroll lock
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
